@@ -26,10 +26,12 @@ jobs:
       run: |
         docker build \
           --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
-          - run: echo "${{ secrets.VITE_SUPABASE_URL }}" \
           --build-arg VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }} \
-          - run: echo "${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
           -t acr48h.azurecr.io/terra-vigilance:v1 .
+
+    - run: |
+        echo ${{ secrets.VITE_SUPABASE_URL }} > .env
+        echo ${{ secrets.VITE_SUPABASE_ANON_KEY }} >> .env
 
     - name: Restart container to apply new image
       run: |
