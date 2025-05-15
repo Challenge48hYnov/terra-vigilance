@@ -410,100 +410,127 @@ const GoogleMap: React.FC<GoogleMapProps> = ({
                         }
                     });
 
-                    activeAlerts
-                        .filter(alert => {
-                            const districtName = zoneToDistrictMap[alert.location] || alert.location;
-                            return selectedZones.includes(districtName);
-                        })
-                        .forEach(alert => {
-                            try {
-                                // Map the alert location to district name
-                                const districtName = zoneToDistrictMap[alert.location] || alert.location;
+                    // Filtrer les alertes par zones sélectionnées
+                    const filteredAlerts = activeAlerts.filter(alert => {
+                        const districtName = zoneToDistrictMap[alert.location] || alert.location;
+                        return selectedZones.includes(districtName);
+                    });
+                    
+                    // Grouper les alertes par district pour les répartir
+                    const alertsByDistrict: Record<string, any[]> = {};
+                    filteredAlerts.forEach(alert => {
+                        const districtName = zoneToDistrictMap[alert.location] || alert.location;
+                        if (!alertsByDistrict[districtName]) {
+                            alertsByDistrict[districtName] = [];
+                        }
+                        alertsByDistrict[districtName].push(alert);
+                    });
+                    
+                    // Pour chaque district, distribuer les points autour du centre
+                    Object.entries(alertsByDistrict).forEach(([districtName, districtAlerts]) => {
+                        // Obtenir les coordonnées de base pour ce district
+                        const baseCoordinates = districtToCoordinates[districtName] || lyonCoordinates;
+                        
+                        // Calculer le nombre de points à distribuer
+                        const numAlerts = districtAlerts.length;
+                        
+                        // Distribuer les points en cercle autour du centre si plus d'un point
+                        districtAlerts.forEach((alert, index) => {
+                            // Calculer de nouvelles coordonnées
+                            let coordinates;
+                            
+                            if (numAlerts === 1) {
+                                // Si un seul point, utiliser le centre
+                                coordinates = baseCoordinates;
+                            } else {
+                                // Sinon, distribuer les points en cercle
+                                const radius = 0.0015; // ~150 mètres sur la carte
+                                const angle = (index / numAlerts) * Math.PI * 2;
+                                coordinates = {
+                                    lat: baseCoordinates.lat + Math.sin(angle) * radius,
+                                    lng: baseCoordinates.lng + Math.cos(angle) * radius
+                                };
+                            }
+                            
+                            // Utiliser une couleur rouge pour toutes les alertes
+                            const color = '#dc2626'; // red pour toutes les alertes
 
-                                // Get coordinates for this district
-                                const coordinates = districtToCoordinates[districtName] || lyonCoordinates;
+                            const alertMarker = new window.google.maps.Marker({
+                                position: coordinates,
+                                map,
+                                title: alert.title,
+                                icon: {
+                                    path: window.google.maps.SymbolPath.CIRCLE,
+                                    scale: 8,
+                                    fillColor: color,
+                                    fillOpacity: 0.8,
+                                    strokeWeight: 0
+                                },
+                                zIndex: 100 // Make sure alerts appear above district polygons
+                            });
 
-                                // Utiliser une couleur rouge pour toutes les alertes
-                                const color = '#dc2626'; // red pour toutes les alertes
-
-                                const alertMarker = new window.google.maps.Marker({
-                                    position: coordinates,
-                                    map,
-                                    title: alert.title,
-                                    icon: {
+                            // Add pulse animation to all alerts using a more robust approach
+                            let animationId: number;
+                            let isAnimating = true;
+                            
+                            const animationStep = () => {
+                                if (!isAnimating) return;
+                                
+                                try {
+                                    const scale = 8 + Math.sin(Date.now() / 300) * 2;
+                                    alertMarker.setIcon({
                                         path: window.google.maps.SymbolPath.CIRCLE,
-                                        scale: 8,
+                                        scale,
                                         fillColor: color,
                                         fillOpacity: 0.8,
                                         strokeWeight: 0
-                                    },
-                                    zIndex: 100 // Make sure alerts appear above district polygons
-                                });
-
-                                // Add pulse animation to all alerts using a more robust approach
-                                let animationId: number;
-                                let isAnimating = true;
-                                
-                                const animationStep = () => {
-                                    if (!isAnimating) return;
-                                    
-                                    try {
-                                        const scale = 8 + Math.sin(Date.now() / 300) * 2;
-                                        alertMarker.setIcon({
-                                            path: window.google.maps.SymbolPath.CIRCLE,
-                                            scale,
-                                            fillColor: color,
-                                            fillOpacity: 0.8,
-                                            strokeWeight: 0
-                                        });
-                                    } catch (error) {
-                                        console.error('Erreur dans l\'animation du marqueur:', error);
-                                        isAnimating = false;
-                                        return;
-                                    }
-                                    
-                                    animationId = requestAnimationFrame(animationStep);
-                                };
+                                    });
+                                } catch (error) {
+                                    console.error('Erreur dans l\'animation du marqueur:', error);
+                                    isAnimating = false;
+                                    return;
+                                }
                                 
                                 animationId = requestAnimationFrame(animationStep);
+                            };
+                            
+                            animationId = requestAnimationFrame(animationStep);
 
-                                // Nettoyer l'animation quand le marqueur est supprimé
-                                const originalSetMap = alertMarker.setMap;
-                                alertMarker.setMap = function(map: any) {
-                                    if (map === null) {
-                                        isAnimating = false;
-                                        cancelAnimationFrame(animationId);
-                                    }
-                                    return originalSetMap.call(this, map);
-                                };
+                            // Nettoyer l'animation quand le marqueur est supprimé
+                            const originalSetMap = alertMarker.setMap;
+                            alertMarker.setMap = function(map: any) {
+                                if (map === null) {
+                                    isAnimating = false;
+                                    cancelAnimationFrame(animationId);
+                                }
+                                return originalSetMap.call(this, map);
+                            };
 
-                                // Modifier l'info window pour ne plus afficher le niveau d'alerte
-                                const infoWindow = new window.google.maps.InfoWindow({
-                                    content: `
-                                    <div style="padding: 5px;">
-                                        <strong>${alert.title}</strong><br/>
-                                        <span style="color: ${color}; font-weight: bold;">
-                                            Type: ${alert.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'}
-                                        </span>
-                                        <br/>
-                                        <span>District: ${districtName}</span>
-                                        ${alert.message ? `<p style="margin-top: 5px; margin-bottom: 0;">${alert.message}</p>` : ''}
-                                    </div>
-                                    `
+                            // Modifier l'info window pour ne plus afficher le niveau d'alerte
+                            const infoWindow = new window.google.maps.InfoWindow({
+                                content: `
+                                <div style="padding: 5px;">
+                                    <strong>${alert.title}</strong><br/>
+                                    <span style="color: ${color}; font-weight: bold;">
+                                        Type: ${alert.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'}
+                                    </span>
+                                    <br/>
+                                    <span>District: ${districtName}</span>
+                                    ${alert.message ? `<p style="margin-top: 5px; margin-bottom: 0;">${alert.message}</p>` : ''}
+                                </div>
+                                `
+                            });
+
+                            alertMarker.addListener("click", () => {
+                                infoWindow.open({
+                                    anchor: alertMarker,
+                                    map
                                 });
+                            });
 
-                                alertMarker.addListener("click", () => {
-                                    infoWindow.open({
-                                        anchor: alertMarker,
-                                        map
-                                    });
-                                });
-
-                                newMarkers.push(alertMarker);
-                            } catch (error) {
-                                console.error('Erreur lors de la création d\'un marqueur d\'alerte:', error, alert);
-                            }
+                            newMarkers.push(alertMarker);
                         });
+                    });
                 } catch (error) {
                     console.error('Erreur dans le traitement des alertes:', error);
                 }

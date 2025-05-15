@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Map as MapIcon, Layers, AlertTriangle, Info, Home, 
   Navigation, List, ChevronDown, ChevronUp, Loader2, Waves, Mountain
@@ -19,7 +19,31 @@ const MapPage: React.FC = () => {
   const [selectedLayers, setSelectedLayers] = useState<string[]>(['alerts', 'flood', 'roads']);
   const [selectedDisasterTypes, setSelectedDisasterTypes] = useState<string[]>(['flood', 'earthquake']);
   
-  // Sélectionner les trois premiers districts par défaut quand ils sont chargés
+  // Correspondance entre les anciennes zones et les noms de quartiers pour compatibilité
+  const zoneToDistrictMap: Record<string, string> = {
+    'Downtown': "Presqu'île",
+    'Riverside': 'Confluence',
+    'North County': 'Croix-Rousse',
+    'East Side': 'Part-Dieu',
+    'West Hills': 'Vieux Lyon / Fourvière'
+  };
+  
+  // Effect pour sélectionner automatiquement les quartiers avec des catastrophes
+  useEffect(() => {
+    if (!disastersLoading && !zonesLoading && disasters.length > 0) {
+      // Récupérer tous les districts uniques ayant des catastrophes actives
+      const districtsWithDisasters = disasters
+        .map(disaster => zoneToDistrictMap[disaster.location] || disaster.location)
+        .filter(Boolean);
+      
+      // Éliminer les doublons
+      const uniqueDistricts = [...new Set(districtsWithDisasters)];
+      
+      // Définir ces districts comme sélectionnés par défaut
+      setSelectedDistricts(uniqueDistricts);
+    }
+  }, [disasters, zonesLoading, disastersLoading]);
+  
   const toggleDistrict = (district: string) => {
     if (selectedDistricts.includes(district)) {
       setSelectedDistricts(selectedDistricts.filter(d => d !== district));
@@ -48,15 +72,6 @@ const MapPage: React.FC = () => {
   const filteredDisasters = disasters.filter(disaster => 
     selectedDisasterTypes.includes(disaster.disaster_type)
   );
-  
-  // Correspondance entre les anciennes zones et les noms de quartiers pour compatibilité
-  const zoneToDistrictMap: Record<string, string> = {
-    'Downtown': "Presqu'île",
-    'Riverside': 'Confluence',
-    'North County': 'Croix-Rousse',
-    'East Side': 'Part-Dieu',
-    'West Hills': 'Vieux Lyon / Fourvière'
-  };
   
   // Couches de carte disponibles
   const availableLayers = [
