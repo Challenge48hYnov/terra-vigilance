@@ -1,0 +1,62 @@
+[
+    {
+        "id": 1,
+        "title": "Community Cleanup",
+        "description": "Help clean up debris after recent flooding in downtown area. Boots and gloves required.",
+        "location": "Downtown",
+        "date": "2025-07-15T10:00",
+        "safetyLevel": "moderate",
+        "category": "volunteer",
+        "image": "https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    },
+    {
+        "id": 2,
+        "title": "Kayaking Tours",
+        "description": "Guided kayaking tours through the flooded downtown streets. Experience the city from a new perspective.",
+        "location": "Downtown",
+        "date": "2025-07-16T14:00",
+        "safetyLevel": "risky",
+        "category": "recreation",
+        "image": "https://images.pexels.com/photos/1430672/pexels-photo-1430672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    },
+    {
+        "id": 3,
+        "title": "Indoor Climbing",
+        "description": "The climbing gym is open and operating on generator power. All skill levels welcome.",
+        "location": "East Side",
+        "date": "2025-07-14T09:00",
+        "safetyLevel": "safe",
+        "category": "recreation",
+        "image": "https://images.pexels.com/photos/260352/pexels-photo-260352.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    },
+    {
+        "id": 4,
+        "title": "First Aid Training",
+        "description": "Learn essential first aid skills to help your community during emergencies.",
+        "location": "North County",
+        "date": "2025-07-18T13:00",
+        "safetyLevel": "safe",
+        "category": "educational",
+        "image": "https://images.pexels.com/photos/6823603/pexels-photo-6823603.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    },
+    {
+        "id": 5,
+        "title": "Extreme Roof Surfing",
+        "description": "Surf on the roofs of flooded buildings. Extreme thrill seekers only!",
+        "location": "Riverside",
+        "date": "2025-07-17T11:00",
+        "safetyLevel": "dangerous",
+        "category": "extreme",
+        "image": "https://images.pexels.com/photos/1654498/pexels-photo-1654498.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    },
+    {
+        "id": 6,
+        "title": "Emergency Supply Drive",
+        "description": "Donate or help distribute emergency supplies to affected communities.",
+        "location": "West Hills",
+        "date": "2025-07-19T09:00",
+        "safetyLevel": "safe",
+        "category": "volunteer",
+        "image": "https://images.pexels.com/photos/6590920/pexels-photo-6590920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    }
+]
