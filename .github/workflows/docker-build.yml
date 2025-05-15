@@ -24,8 +24,10 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build -t acr48h.azurecr.io/terra-vigilance:v1 .
-        docker push acr48h.azurecr.io/terra-vigilance:v1
+        docker build \
+          --build-arg VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }} \
+          --build-arg VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }} \
+          -t acr48h.azurecr.io/terra-vigilance:v1 .
 
     - name: Restart container to apply new image
       run: |
