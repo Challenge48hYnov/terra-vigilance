@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { 
-  Activity, AlertTriangle, Compass, Calendar, MapPin, 
-  ThumbsUp, ThumbsDown, Filter, Search, ArrowRight 
+import React, { useState, useEffect } from 'react';
+import {
+  Activity, AlertTriangle, Compass, Calendar, MapPin,
+  ThumbsUp, ThumbsDown, Filter, Search, ArrowRight
 } from 'lucide-react';
 import { useAlertContext } from '../contexts/AlertContext';
 import { motion } from 'framer-motion';
@@ -16,8 +16,6 @@ interface ActivityItem {
   safetyLevel: 'safe' | 'moderate' | 'risky' | 'dangerous';
   category: string;
   image: string;
-  likes: number;
-  dislikes: number;
 }
 
 const ActivitiesPage: React.FC = () => {
@@ -25,95 +23,31 @@ const ActivitiesPage: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [selectedSafety, setSelectedSafety] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  
-  // Mock activities data - in a real app, this would come from an API
-  const activities: ActivityItem[] = [
-    {
-      id: '1',
-      title: 'Community Cleanup',
-      description: 'Help clean up debris after recent flooding in downtown area. Boots and gloves required.',
-      location: 'Downtown',
-      date: '2025-07-15T10:00',
-      safetyLevel: 'moderate',
-      category: 'volunteer',
-      image: 'https://images.pexels.com/photos/6646918/pexels-photo-6646918.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 24,
-      dislikes: 2,
-    },
-    {
-      id: '2',
-      title: 'Kayaking Tours',
-      description: 'Guided kayaking tours through the flooded downtown streets. Experience the city from a new perspective.',
-      location: 'Downtown',
-      date: '2025-07-16T14:00',
-      safetyLevel: 'risky',
-      category: 'recreation',
-      image: 'https://images.pexels.com/photos/1430672/pexels-photo-1430672.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 15,
-      dislikes: 8,
-    },
-    {
-      id: '3',
-      title: 'Indoor Climbing',
-      description: 'The climbing gym is open and operating on generator power. All skill levels welcome.',
-      location: 'East Side',
-      date: '2025-07-14T09:00',
-      safetyLevel: 'safe',
-      category: 'recreation',
-      image: 'https://images.pexels.com/photos/260352/pexels-photo-260352.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 32,
-      dislikes: 0,
-    },
-    {
-      id: '4',
-      title: 'First Aid Training',
-      description: 'Learn essential first aid skills to help your community during emergencies.',
-      location: 'North County',
-      date: '2025-07-18T13:00',
-      safetyLevel: 'safe',
-      category: 'educational',
-      image: 'https://images.pexels.com/photos/6823603/pexels-photo-6823603.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 42,
-      dislikes: 1,
-    },
-    {
-      id: '5',
-      title: 'Extreme Roof Surfing',
-      description: 'Surf on the roofs of flooded buildings. Extreme thrill seekers only!',
-      location: 'Riverside',
-      date: '2025-07-17T11:00',
-      safetyLevel: 'dangerous',
-      category: 'extreme',
-      image: 'https://images.pexels.com/photos/1654498/pexels-photo-1654498.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 8,
-      dislikes: 45,
-    },
-    {
-      id: '6',
-      title: 'Emergency Supply Drive',
-      description: 'Donate or help distribute emergency supplies to affected communities.',
-      location: 'West Hills',
-      date: '2025-07-19T09:00',
-      safetyLevel: 'safe',
-      category: 'volunteer',
-      image: 'https://images.pexels.com/photos/6590920/pexels-photo-6590920.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2',
-      likes: 56,
-      dislikes: 0,
-    },
-  ];
-  
+  const [activities, setActivities] = useState<ActivityItem[]>([]);
+
+  useEffect(() => {
+    fetch('/files/activities.json')
+      .then((res) => res.json())
+      .then((data) => {
+        setActivities(data);
+      })
+      .catch((error) => {
+        console.error('Erreur de chargement du JSON :', error);
+      });
+  }, []);
+
   // Filter activities based on category, safety level, and search query
   const filteredActivities = activities.filter(activity => {
     const matchesCategory = selectedCategory === 'all' || activity.category === selectedCategory;
     const matchesSafety = selectedSafety === 'all' || activity.safetyLevel === selectedSafety;
-    const matchesSearch = 
+    const matchesSearch =
       activity.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
       activity.location.toLowerCase().includes(searchQuery.toLowerCase());
-    
+
     return matchesCategory && matchesSafety && matchesSearch;
   });
-  
+
   // Helper function to get the safety level color and text
   const getSafetyInfo = (level: ActivityItem['safetyLevel']) => {
     switch (level) {
@@ -129,11 +63,11 @@ const ActivitiesPage: React.FC = () => {
         return { color: '', text: '' };
     }
   };
-  
+
   // Check if an activity is in an area with active alerts
   const hasActiveAlert = (location: string) => {
-    return activeAlerts.some(alert => 
-      alert.location === location && 
+    return activeAlerts.some(alert =>
+      alert.location === location &&
       (alert.level === 'emergency' || alert.level === 'danger')
     );
   };
@@ -146,7 +80,7 @@ const ActivitiesPage: React.FC = () => {
           Discover things to do in your area, with real-time safety ratings
         </p>
       </div>
-      
+
       {/* Filters and Search */}
       <div className="mb-6 bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
         <div className="flex flex-col md:flex-row gap-4">
@@ -164,7 +98,7 @@ const ActivitiesPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row gap-3">
             <div className="flex items-center">
               <Filter size={16} className="mr-2 text-neutral-500" />
@@ -180,7 +114,7 @@ const ActivitiesPage: React.FC = () => {
                 <option value="extreme">Extreme</option>
               </select>
             </div>
-            
+
             <div className="flex items-center">
               <AlertTriangle size={16} className="mr-2 text-neutral-500" />
               <select
@@ -198,16 +132,16 @@ const ActivitiesPage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Activities Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredActivities.length > 0 ? (
           filteredActivities.map((activity) => {
             const safetyInfo = getSafetyInfo(activity.safetyLevel);
             const hasAlert = hasActiveAlert(activity.location);
-            
+
             return (
-              <motion.div 
+              <motion.div
                 key={activity.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -215,8 +149,8 @@ const ActivitiesPage: React.FC = () => {
                 className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden"
               >
                 <div className="relative">
-                  <img 
-                    src={activity.image} 
+                  <img
+                    src={activity.image}
                     alt={activity.title}
                     className="w-full h-48 object-cover"
                   />
@@ -225,7 +159,7 @@ const ActivitiesPage: React.FC = () => {
                       {safetyInfo.text}
                     </span>
                   </div>
-                  
+
                   {hasAlert && (
                     <div className="absolute top-2 left-2">
                       <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 animate-pulse">
@@ -235,13 +169,13 @@ const ActivitiesPage: React.FC = () => {
                     </div>
                   )}
                 </div>
-                
+
                 <div className="p-4">
                   <h3 className="text-lg font-semibold mb-2">{activity.title}</h3>
                   <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-4">
                     {activity.description}
                   </p>
-                  
+
                   <div className="space-y-2 text-sm text-neutral-500 dark:text-neutral-400 mb-4">
                     <div className="flex items-center">
                       <MapPin size={14} className="mr-2" />
@@ -256,9 +190,9 @@ const ActivitiesPage: React.FC = () => {
                       <span className="capitalize">{activity.category}</span>
                     </div>
                   </div>
-                  
+
                   <div className="flex justify-between items-center">
-                    <div className="flex space-x-3">
+                    {/* <div className="flex space-x-3">
                       <div className="flex items-center">
                         <ThumbsUp size={14} className="mr-1 text-green-600 dark:text-green-400" />
                         <span className="text-sm">{activity.likes}</span>
@@ -267,12 +201,12 @@ const ActivitiesPage: React.FC = () => {
                         <ThumbsDown size={14} className="mr-1 text-red-600 dark:text-red-400" />
                         <span className="text-sm">{activity.dislikes}</span>
                       </div>
-                    </div>
-                    
-                    <button className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
+                    </div> */}
+
+                    {/* <button className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
                       Details
                       <ArrowRight size={14} className="ml-1" />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
               </motion.div>
@@ -288,7 +222,7 @@ const ActivitiesPage: React.FC = () => {
           </div>
         )}
       </div>
-      
+
       {/* Safety Disclaimer */}
       <div className="mt-8 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50 rounded-lg p-4">
         <div className="flex items-start">
