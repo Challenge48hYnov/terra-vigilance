@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import { useAlertContext } from '../contexts/AlertContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import GoogleMap from '../components/GoogleMap'; // Import the new component
 
 const MapPage: React.FC = () => {
   const { activeAlerts } = useAlertContext();
@@ -238,105 +239,12 @@ const MapPage: React.FC = () => {
         {/* Map Container */}
         <div className="md:col-span-2">
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
-            {/* Map Placeholder - In a real app, this would be an actual map component */}
-            <div className="relative h-[700px] bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center">
-              <div className="text-center">
-                <MapIcon size={48} className="mx-auto mb-4 text-neutral-400" />
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  Interactive map would be displayed here
-                </p>
-                <p className="text-neutral-500 dark:text-neutral-500 max-w-sm mx-auto mt-2 text-sm">
-                  In a real implementation, this would use Leaflet or Google Maps with real-time data overlays
-                </p>
-              </div>
-              
-              {/* Map visualization placeholder */}
-              <div className="absolute inset-0 overflow-hidden">
-                {/* Downtown flood zone */}
-                {selectedZones.includes('Downtown') && selectedLayers.includes('flood') && (
-                  <div className="absolute left-[40%] top-[45%] w-[20%] h-[15%] bg-blue-500 opacity-30 rounded-full"></div>
-                )}
-                
-                {/* Riverside flood zone */}
-                {selectedZones.includes('Riverside') && selectedLayers.includes('flood') && (
-                  <div className="absolute left-[60%] top-[60%] w-[25%] h-[18%] bg-blue-500 opacity-30 rounded-full"></div>
-                )}
-                
-                {/* Road closures */}
-                {selectedLayers.includes('roads') && (
-                  <>
-                    <div className="absolute left-[30%] top-[50%] w-[15%] h-[2px] bg-red-500 rotate-45"></div>
-                    <div className="absolute left-[50%] top-[40%] w-[20%] h-[2px] bg-red-500"></div>
-                  </>
-                )}
-                
-                {/* Alert markers */}
-                {selectedLayers.includes('alerts') && activeAlerts.map((alert, index) => {
-                  if (!selectedZones.includes(alert.location)) return null;
-                  
-                  // Different positions for different locations
-                  let positionStyle = {};
-                  switch(alert.location) {
-                    case 'Downtown':
-                      positionStyle = { left: '45%', top: '50%' };
-                      break;
-                    case 'Riverside':
-                      positionStyle = { left: '65%', top: '65%' };
-                      break;
-                    case 'North County':
-                      positionStyle = { left: '35%', top: '25%' };
-                      break;
-                    case 'East Side':
-                      positionStyle = { left: '75%', top: '40%' };
-                      break;
-                    case 'West Hills':
-                      positionStyle = { left: '20%', top: '60%' };
-                      break;
-                  }
-                  
-                  let bgColor = 'bg-green-500';
-                  if (alert.level === 'emergency') bgColor = 'bg-red-600';
-                  if (alert.level === 'danger') bgColor = 'bg-orange-500';
-                  if (alert.level === 'warning') bgColor = 'bg-amber-400';
-                  
-                  return (
-                    <div 
-                      key={alert.id}
-                      className={`absolute w-4 h-4 ${bgColor} rounded-full flex items-center justify-center animate-pulse`}
-                      style={positionStyle}
-                    >
-                      <span className="relative flex h-3 w-3">
-                        <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${bgColor} opacity-75`}></span>
-                      </span>
-                    </div>
-                  );
-                })}
-                
-                {/* Resource markers */}
-                {selectedLayers.includes('resources') && (
-                  <>
-                    <div className="absolute left-[40%] top-[30%] w-5 h-5 bg-white border-2 border-blue-600 rounded-full flex items-center justify-center text-xs font-bold text-blue-600">
-                      H
-                    </div>
-                    <div className="absolute left-[60%] top-[40%] w-5 h-5 bg-white border-2 border-purple-600 rounded-full flex items-center justify-center text-xs font-bold text-purple-600">
-                      F
-                    </div>
-                  </>
-                )}
-                
-                {/* Shelter markers */}
-                {selectedLayers.includes('shelters') && (
-                  <>
-                    <div className="absolute left-[50%] top-[60%] w-5 h-5 bg-white border-2 border-green-600 rounded-full flex items-center justify-center text-xs font-bold text-green-600">
-                      S
-                    </div>
-                    <div className="absolute left-[30%] top-[70%] w-5 h-5 bg-white border-2 border-green-600 rounded-full flex items-center justify-center text-xs font-bold text-green-600">
-                      S
-                    </div>
-                  </>
-                )}
-              </div>
-            </div>
+            {/* Replace the map placeholder with the actual Google Map */}
+            <GoogleMap 
+              selectedZones={selectedZones}
+              selectedLayers={selectedLayers}
+              activeAlerts={activeAlerts}
+            />
           </div>
         </div>
       </div>

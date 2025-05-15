@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import Header from './Header';
 import Sidebar from './Sidebar';
-import Footer from './Footer';
+// import Footer from './Footer';
 import EmergencyBanner from './EmergencyBanner';
 import { motion } from 'framer-motion';
 
@@ -55,7 +55,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         </main>
       </div>
       
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
