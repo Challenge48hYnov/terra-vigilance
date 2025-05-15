@@ -696,18 +696,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
                     // Get coordinates for this district
                     const coordinates = districtToCoordinates[districtName] || lyonCoordinates;
 
-                    // Set color based on alert level
-                    let color = '#22c55e'; // safe - green
-                    if (alert.level === 'emergency') color = '#dc2626'; // red
-                    if (alert.level === 'danger') color = '#ea580c'; // orange
-                    if (alert.level === 'warning') color = '#f59e0b'; // amber
-
-                    // Formatage du niveau d'alerte pour l'affichage
-                    let levelText = 'Information';
-                    if (alert.level === 'emergency') levelText = 'Urgence';
-                    if (alert.level === 'danger') levelText = 'Danger';
-                    if (alert.level === 'warning') levelText = 'Avertissement';
-                    if (alert.level === 'safe') levelText = 'Zone sécurisée';
+                    // Utiliser une couleur rouge pour toutes les alertes
+                    const color = '#dc2626'; // red pour toutes les alertes
 
                     const alertMarker = new google.maps.Marker({
                         position: coordinates,
@@ -723,32 +713,37 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
                         zIndex: 100 // Make sure alerts appear above district polygons
                     });
 
-                    // Add pulse animation to emergency alerts
-                    if (alert.level === 'emergency' || alert.level === 'danger') {
-                        const animationStep = () => {
-                            const scale = 8 + Math.sin(Date.now() / 300) * 2;
-                            alertMarker.setIcon({
-                                path: google.maps.SymbolPath.CIRCLE,
-                                scale,
-                                fillColor: color,
-                                fillOpacity: 0.8,
-                                strokeWeight: 0
-                            });
-                            requestAnimationFrame(animationStep);
-                        };
+                    // Add pulse animation to all alerts
+                    const animationStep = () => {
+                        const scale = 8 + Math.sin(Date.now() / 300) * 2;
+                        alertMarker.setIcon({
+                            path: google.maps.SymbolPath.CIRCLE,
+                            scale,
+                            fillColor: color,
+                            fillOpacity: 0.8,
+                            strokeWeight: 0
+                        });
                         requestAnimationFrame(animationStep);
-                    }
+                    };
+                    requestAnimationFrame(animationStep);
 
-                    // Add info window with alert type included
+                    // Modifier l'info window pour inclure le niveau d'urgence
                     const infoWindow = new google.maps.InfoWindow({
                         content: `
-                <div style="padding: 5px;">
-                    <strong>${alert.title}</strong><br/>
-                    <span style="color: ${color}; font-weight: bold;">Type: ${levelText}</span><br/>
-                    <span>District: ${districtName}</span>
-                    ${alert.message ? `<p style="margin-top: 5px; margin-bottom: 0;">${alert.message}</p>` : ''}
-                </div>
-            `
+                        <div style="padding: 5px;">
+                            <strong>${alert.title}</strong><br/>
+                            <span style="color: ${color}; font-weight: bold;">
+                                Type: ${alert.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'}
+                            </span>
+                            <br/>
+                            <span style="color: #dc2626; font-weight: bold;">
+                                Niveau: Emergency
+                            </span>
+                            <br/>
+                            <span>District: ${districtName}</span>
+                            ${alert.message ? `<p style="margin-top: 5px; margin-bottom: 0;">${alert.message}</p>` : ''}
+                        </div>
+                        `
                     });
 
                     alertMarker.addListener("click", () => {

@@ -3,9 +3,10 @@ import {
   Map as MapIcon, Layers, AlertTriangle, Info, Home, 
   Navigation, List, ChevronDown, ChevronUp 
 } from 'lucide-react';
-import { useAlertContext } from '../contexts/AlertContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import GoogleMap from '../components/GoogleMap'; // Import the new component
+import GoogleMap from '../components/GoogleMap';
+import { useDisasters } from '../hooks/useDisasters'; // Import du nouveau hook
+import { Loader2 } from 'lucide-react'; // Pour afficher un loader pendant le chargement
 
 // Lyon districts data for filtering
 const lyonDistricts = [
@@ -21,15 +22,15 @@ const lyonDistricts = [
 ];
 
 const MapPage: React.FC = () => {
-  const { activeAlerts } = useAlertContext();
+  // Utiliser le hook pour récupérer les catastrophes
+  const { disasters, loading, error } = useDisasters();
+  
   const [showLegend, setShowLegend] = useState(true);
-  // Update state to use Lyon district names instead of generic zones
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([
     "Presqu'île", "Confluence", "Part-Dieu"
   ]);
   const [selectedLayers, setSelectedLayers] = useState<string[]>(['alerts', 'flood', 'roads']);
   
-  // Update toggle function to work with districts
   const toggleDistrict = (district: string) => {
     if (selectedDistricts.includes(district)) {
       setSelectedDistricts(selectedDistricts.filter(d => d !== district));
@@ -55,11 +56,9 @@ const MapPage: React.FC = () => {
     'West Hills': 'Vieux Lyon / Fourvière'
   };
   
-  // Available map layers - in a real app, these would be actual map layers
+  // Available map layers
   const availableLayers = [
     { id: 'alerts', name: 'Active Alerts', icon: <AlertTriangle size={16} /> },
-    { id: 'flood', name: 'Flood Zones', icon: <MapIcon size={16} /> },
-    { id: 'roads', name: 'Road Closures', icon: <MapIcon size={16} /> },
     { id: 'resources', name: 'Emergency Resources', icon: <Info size={16} /> },
     { id: 'shelters', name: 'Shelters', icon: <Home size={16} /> },
   ];
@@ -100,25 +99,13 @@ const MapPage: React.FC = () => {
                 >
                   <div className="mb-4">
                     <h3 className="font-medium mb-2 flex items-center">
-                      <AlertTriangle size={16} className="mr-1 text-amber-600 dark:text-amber-400" />
-                      Alert Severity
+                      <AlertTriangle size={16} className="mr-1 text-red-600 dark:text-red-400" />
+                      Disaster Alerts
                     </h3>
                     <div className="space-y-2 pl-6">
                       <div className="flex items-center">
                         <span className="w-4 h-4 bg-red-600 rounded-full mr-2"></span>
-                        <span className="text-sm">Emergency (Immediate action required)</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="w-4 h-4 bg-orange-500 rounded-full mr-2"></span>
-                        <span className="text-sm">Danger (High risk)</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="w-4 h-4 bg-amber-400 rounded-full mr-2"></span>
-                        <span className="text-sm">Warning (Be prepared)</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="w-4 h-4 bg-green-500 rounded-full mr-2"></span>
-                        <span className="text-sm">Safe (No immediate danger)</span>
+                        <span className="text-sm">Active disaster area</span>
                       </div>
                     </div>
                   </div>
@@ -143,29 +130,12 @@ const MapPage: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  
-                  <div>
-                    <h3 className="font-medium mb-2 flex items-center">
-                      <MapIcon size={16} className="mr-1 text-cyan-600 dark:text-cyan-400" />
-                      Other Symbols
-                    </h3>
-                    <div className="space-y-2 pl-6">
-                      <div className="flex items-center">
-                        <span className="w-4 h-0.5 bg-red-500 mr-2"></span>
-                        <span className="text-sm">Road Closure</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="w-4 h-4 border-2 border-blue-500 bg-blue-100 dark:bg-blue-900 bg-opacity-50 mr-2"></span>
-                        <span className="text-sm">Flood Zone</span>
-                      </div>
-                    </div>
-                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
           
-          {/* Districts Filter - Updated from Zones Filter */}
+          {/* Districts Filter */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
               <Navigation size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
@@ -188,9 +158,14 @@ const MapPage: React.FC = () => {
                     <span className="text-sm text-neutral-700 dark:text-neutral-300">
                       {district.name}
                     </span>
-                    {activeAlerts.some(alert => zoneToDistrictMap[alert.location] === district.name) && (
+                    {disasters.some(disaster => 
+                      (zoneToDistrictMap[disaster.location] === district.name || disaster.location === district.name)
+                    ) && (
                       <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                        {activeAlerts.filter(alert => zoneToDistrictMap[alert.location] === district.name).length} alert(s)
+                        {disasters.filter(disaster => 
+                          zoneToDistrictMap[disaster.location] === district.name || 
+                          disaster.location === district.name
+                        ).length} alert(s)
                       </span>
                     )}
                   </div>
@@ -223,35 +198,40 @@ const MapPage: React.FC = () => {
             </div>
           </div>
           
-          {/* Active Alerts in Map - Updated to use district mapping */}
+          {/* Active Alerts in Map */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
               <List size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
               Active Alerts on Map
             </h3>
-            {activeAlerts.filter(alert => 
-              selectedDistricts.includes(zoneToDistrictMap[alert.location])
+            
+            {loading ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+                <span className="ml-2 text-sm">Loading disasters...</span>
+              </div>
+            ) : error ? (
+              <p className="text-red-500 text-sm">Error loading disasters: {error.message}</p>
+            ) : disasters.filter(disaster => 
+              selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
             ).length > 0 ? (
               <div className="space-y-3">
-                {activeAlerts
-                  .filter(alert => selectedDistricts.includes(zoneToDistrictMap[alert.location]))
-                  .map(alert => (
+                {disasters
+                  .filter(disaster => 
+                    selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
+                  )
+                  .map(disaster => (
                     <div 
-                      key={alert.id} 
-                      className={`
-                        p-2 rounded border text-sm
-                        ${alert.level === 'emergency' ? 'bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50' : ''}
-                        ${alert.level === 'danger' ? 'bg-orange-50 border-orange-200 dark:bg-orange-900/10 dark:border-orange-800/50' : ''}
-                        ${alert.level === 'warning' ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/10 dark:border-amber-800/50' : ''}
-                        ${alert.level === 'safe' ? 'bg-green-50 border-green-200 dark:bg-green-900/10 dark:border-green-800/50' : ''}
-                      `}
+                      key={disaster.id} 
+                      className="p-2 rounded border text-sm bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800/50"
                     >
                       <div className="flex items-start">
-                        <AlertTriangle size={14} className="mr-1 mt-0.5 flex-shrink-0" />
+                        <AlertTriangle size={14} className="mr-1 mt-0.5 flex-shrink-0 text-red-600" />
                         <div>
-                          <p className="font-medium">{alert.title}</p>
+                          <p className="font-medium">{disaster.title || disaster.name}</p>
                           <p className="text-neutral-600 dark:text-neutral-400 text-xs">
-                            {zoneToDistrictMap[alert.location] || alert.location}
+                            {disaster.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'} - 
+                            {zoneToDistrictMap[disaster.location] || disaster.location}
                           </p>
                         </div>
                       </div>
@@ -270,12 +250,11 @@ const MapPage: React.FC = () => {
         {/* Map Container */}
         <div className="md:col-span-2">
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
-            {/* Update the GoogleMap to use selectedDistricts instead of selectedZones */}
             <GoogleMap 
               selectedZones={selectedDistricts}
               selectedLayers={selectedLayers}
-              activeAlerts={activeAlerts}
-              zoneToDistrictMap={zoneToDistrictMap} // Add this prop
+              activeAlerts={disasters} // Utiliser les catastrophes depuis Supabase
+              zoneToDistrictMap={zoneToDistrictMap}
             />
           </div>
         </div>
