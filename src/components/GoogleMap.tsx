@@ -21,25 +21,28 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
   const [markers, setMarkers] = useState<any[]>([]);
   const [districtPolygons, setDistrictPolygons] = useState<any[]>([]);
   
-  const lyonCoordinates = { lat: 45.764043, lng: 4.835659 }; // Lyon, France coordinates
+  // Centré plus précisément sur Lyon
+  const lyonCoordinates = { lat: 45.760, lng: 4.830 };
   
   useEffect(() => {
+    const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
     // Load Google Maps script
     const initMap = () => {
       if (mapRef.current && !map) {
         const mapOptions = {
           center: lyonCoordinates,
-          zoom: 13,
+          zoom: 14, // Zoom augmenté pour voir les districts plus clairement
           mapTypeControl: true,
           streetViewControl: true,
           fullscreenControl: true,
           zoomControl: true,
+          // Restrictions réduites pour ne montrer que les districts et un peu autour
           restriction: {
             latLngBounds: {
-              north: 45.8082, // North of Lyon
-              south: 45.7077, // South of Lyon
-              east: 4.9023,   // East of Lyon
-              west: 4.7695    // West of Lyon
+              north: 45.7900, // Limite nord réduite
+              south: 45.7300, // Limite sud augmentée
+              east: 4.8900,   // Limite est réduite
+              west: 4.7950    // Limite ouest augmentée
             },
             strictBounds: true
           },
@@ -47,7 +50,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
             {
               featureType: 'poi',
               elementType: 'labels',
-              stylers: [{ visibility: 'on' }]
+              stylers: [{ visibility: 'off' }] // Désactive les points d'intérêt pour réduire l'encombrement
             }
           ]
         };
@@ -57,12 +60,34 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
         
         // Draw district boundaries once map is loaded
         drawDistrictBoundaries(newMap);
+        
+        // Ajustement automatique de la vue pour qu'elle englobe tous les districts
+        setTimeout(() => {
+          // Créer un bounds qui contient tous les districts
+          const bounds = new google.maps.LatLngBounds();
+          
+          // Définir les districts
+          const districts = getAllDistrictCoordinates();
+          
+          // Ajouter tous les points à notre bounds
+          districts.forEach(district => {
+            district.coordinates.forEach(coord => {
+              bounds.extend(new google.maps.LatLng(coord.lat, coord.lng));
+            });
+          });
+          
+          // Ajuster la vue pour englober tous les districts
+          newMap.fitBounds(bounds);
+          
+          // Ajouter un petit espace autour
+          newMap.setZoom(newMap.getZoom() - 0.3);
+        }, 500);
       }
     };
 
     if (!window.google) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBhtMVuPCeEo_HG2TDjWsR6-1AoUsOvpzE&libraries=places,drawing,geometry`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places,drawing,geometry`;
       script.async = true;
       script.defer = true;
       script.onload = initMap;
@@ -75,6 +100,138 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
       initMap();
     }
   }, []);
+  
+  // Fonction pour obtenir tous les coordonnées de tous les districts (ajouter en haut du fichier)
+  const getAllDistrictCoordinates = () => {
+    return [
+      {
+        name: 'Presqu\'île',
+        coordinates: [
+          { lat: 45.7650, lng: 4.8310 },
+          { lat: 45.7680, lng: 4.8360 },
+          { lat: 45.7650, lng: 4.8380 },
+          { lat: 45.7620, lng: 4.8350 },
+          { lat: 45.7610, lng: 4.8330 },
+          { lat: 45.7630, lng: 4.8300 },
+        ]
+      },
+      {
+        name: 'Confluence',
+        coordinates: [
+          { lat: 45.7600, lng: 4.8290 },
+          { lat: 45.7610, lng: 4.8330 },
+          { lat: 45.7590, lng: 4.8350 },
+          { lat: 45.7560, lng: 4.8340 },
+          { lat: 45.7530, lng: 4.8310 },
+          { lat: 45.7540, lng: 4.8260 },
+          { lat: 45.7570, lng: 4.8270 },
+        ]
+      },
+      {
+        name: 'Part-Dieu',
+        coordinates: [
+          { lat: 45.7660, lng: 4.8380 },
+          { lat: 45.7680, lng: 4.8430 },
+          { lat: 45.7700, lng: 4.8500 },
+          { lat: 45.7680, lng: 4.8550 },
+          { lat: 45.7660, lng: 4.8600 },
+          { lat: 45.7620, lng: 4.8650 },
+          { lat: 45.7580, lng: 4.8700 },
+          { lat: 45.7550, lng: 4.8650 },
+          { lat: 45.7560, lng: 4.8580 },
+          { lat: 45.7580, lng: 4.8520 },
+          { lat: 45.7590, lng: 4.8450 },
+          { lat: 45.7640, lng: 4.8400 },
+        ]
+      },
+      {
+        name: 'Croix-Rousse',
+        coordinates: [
+          { lat: 45.7730, lng: 4.8250 },
+          { lat: 45.7780, lng: 4.8300 },
+          { lat: 45.7790, lng: 4.8370 },
+          { lat: 45.7750, lng: 4.8400 },
+          { lat: 45.7700, lng: 4.8380 },
+          { lat: 45.7680, lng: 4.8360 },
+          { lat: 45.7650, lng: 4.8320 },
+          { lat: 45.7670, lng: 4.8280 },
+          { lat: 45.7700, lng: 4.8260 },
+        ]
+      },
+      {
+        name: 'Vieux Lyon / Fourvière',
+        coordinates: [
+          { lat: 45.7630, lng: 4.8290 },
+          { lat: 45.7600, lng: 4.8280 },
+          { lat: 45.7570, lng: 4.8270 },
+          { lat: 45.7540, lng: 4.8200 },
+          { lat: 45.7520, lng: 4.8150 },
+          { lat: 45.7550, lng: 4.8100 },
+          { lat: 45.7600, lng: 4.8080 },
+          { lat: 45.7650, lng: 4.8100 },
+          { lat: 45.7680, lng: 4.8150 },
+          { lat: 45.7690, lng: 4.8200 },
+          { lat: 45.7670, lng: 4.8250 },
+          { lat: 45.7650, lng: 4.8280 },
+        ]
+      },
+      {
+        name: 'Brotteaux',
+        coordinates: [
+          { lat: 45.7700, lng: 4.8380 },
+          { lat: 45.7740, lng: 4.8400 },
+          { lat: 45.7780, lng: 4.8450 },
+          { lat: 45.7760, lng: 4.8500 },
+          { lat: 45.7720, lng: 4.8520 },
+          { lat: 45.7680, lng: 4.8480 },
+          { lat: 45.7650, lng: 4.8430 },
+          { lat: 45.7680, lng: 4.8400 },
+        ]
+      },
+      {
+        name: 'Guillotière',
+        coordinates: [
+          { lat: 45.7590, lng: 4.8350 },
+          { lat: 45.7640, lng: 4.8400 },
+          { lat: 45.7590, lng: 4.8450 },
+          { lat: 45.7550, lng: 4.8580 },
+          { lat: 45.7500, lng: 4.8500 },
+          { lat: 45.7480, lng: 4.8400 },
+          { lat: 45.7510, lng: 4.8330 },
+          { lat: 45.7530, lng: 4.8310 },
+          { lat: 45.7560, lng: 4.8340 },
+        ]
+      },
+      {
+        name: 'Monplaisir',
+        coordinates: [
+          { lat: 45.7550, lng: 4.8580 },
+          { lat: 45.7580, lng: 4.8650 },
+          { lat: 45.7600, lng: 4.8750 },
+          { lat: 45.7550, lng: 4.8850 },
+          { lat: 45.7480, lng: 4.8800 },
+          { lat: 45.7450, lng: 4.8650 },
+          { lat: 45.7480, lng: 4.8580 },
+          { lat: 45.7500, lng: 4.8500 },
+        ]
+      },
+      {
+        name: 'Vaise',
+        coordinates: [
+          { lat: 45.7680, lng: 4.8150 },
+          { lat: 45.7700, lng: 4.8100 },
+          { lat: 45.7750, lng: 4.8080 },
+          { lat: 45.7800, lng: 4.8150 },
+          { lat: 45.7820, lng: 4.8200 },
+          { lat: 45.7780, lng: 4.8300 },
+          { lat: 45.7740, lng: 4.8250 },
+          { lat: 45.7700, lng: 4.8260 },
+          { lat: 45.7670, lng: 4.8250 },
+          { lat: 45.7690, lng: 4.8200 },
+        ]
+      },
+    ];
+  };
   
   // Draw district boundaries based on the image
   const drawDistrictBoundaries = (map: any) => {
@@ -565,7 +722,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
     setMarkers(newMarkers);
   }, [map, selectedZones, selectedLayers, activeAlerts]);
   
-  return <div ref={mapRef} style={{ width: '100%', height: '700px' }} />;
+  return <div ref={mapRef} style={{ width: '100%', height: '550px', borderRadius: '8px' }} />; // Hauteur légèrement réduite
 };
 
 export default GoogleMap;
