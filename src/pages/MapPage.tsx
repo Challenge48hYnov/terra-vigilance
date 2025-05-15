@@ -6,29 +6,25 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import GoogleMap from '../components/GoogleMap';
 import { useDisasters } from '../hooks/useDisasters';
-
-// Données des quartiers de Lyon pour le filtrage
-const lyonDistricts = [
-  { id: 1, name: "Presqu'île", color: "#4ADE80" },
-  { id: 2, name: "Confluence", color: "#86EFAC" },
-  { id: 3, name: "Part-Dieu", color: "#38BDF8" },
-  { id: 4, name: "Croix-Rousse", color: "#4ADE80" },
-  { id: 5, name: "Vieux Lyon / Fourvière", color: "#FB923C" },
-  { id: 6, name: "Brotteaux", color: "#0EA5E9" },
-  { id: 7, name: "Guillotière", color: "#7DD3FC" },
-  { id: 8, name: "Monplaisir", color: "#BAE6FD" },
-  { id: 9, name: "Vaise", color: "#FDBA74" }
-];
+import { useZones } from '../hooks/useZones';
 
 const MapPage: React.FC = () => {
   // Utilisation du hook pour récupérer les catastrophes
-  const { disasters, loading, error } = useDisasters();
+  const { disasters, loading: disastersLoading, error: disastersError } = useDisasters();
+  // Utilisation du hook pour récupérer les zones
+  const { zones, loading: zonesLoading, error: zonesError } = useZones();
   
   const [showLegend, setShowLegend] = useState(true);
-  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([
-    "Presqu'île", "Confluence", "Part-Dieu"
-  ]);
+  const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedLayers, setSelectedLayers] = useState<string[]>(['alerts', 'flood', 'roads']);
+  
+  // Sélectionner les trois premiers districts par défaut quand ils sont chargés
+  React.useEffect(() => {
+    if (zones.length > 0 && selectedDistricts.length === 0) {
+      const initialDistricts = zones.slice(0, 3).map(zone => zone.name);
+      setSelectedDistricts(initialDistricts);
+    }
+  }, [zones]);
   
   const toggleDistrict = (district: string) => {
     if (selectedDistricts.includes(district)) {
@@ -140,37 +136,47 @@ const MapPage: React.FC = () => {
               <Navigation size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
               Quartiers de Lyon
             </h3>
-            <div className="space-y-2">
-              {lyonDistricts.map(district => (
-                <label key={district.id} className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={selectedDistricts.includes(district.name)}
-                    onChange={() => toggleDistrict(district.name)}
-                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
-                  />
-                  <div className="ml-2 flex items-center">
-                    <span 
-                      className="inline-block w-3 h-3 rounded-full mr-1.5"
-                      style={{ backgroundColor: district.color }}
-                    ></span>
-                    <span className="text-sm text-neutral-700 dark:text-neutral-300">
-                      {district.name}
-                    </span>
-                    {disasters.some(disaster => 
-                      (zoneToDistrictMap[disaster.location] === district.name || disaster.location === district.name)
-                    ) && (
-                      <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                        {disasters.filter(disaster => 
-                          zoneToDistrictMap[disaster.location] === district.name || 
-                          disaster.location === district.name
-                        ).length} alerte(s)
+            
+            {zonesLoading ? (
+              <div className="flex items-center justify-center p-4">
+                <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
+                <span className="ml-2 text-sm">Chargement des quartiers...</span>
+              </div>
+            ) : zonesError ? (
+              <p className="text-red-500 text-sm">Erreur de chargement des quartiers: {zonesError.message}</p>
+            ) : (
+              <div className="space-y-2">
+                {zones.map(zone => (
+                  <label key={zone.id} className="flex items-center">
+                    <input
+                      type="checkbox"
+                      checked={selectedDistricts.includes(zone.name)}
+                      onChange={() => toggleDistrict(zone.name)}
+                      className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                    />
+                    <div className="ml-2 flex items-center">
+                      <span 
+                        className="inline-block w-3 h-3 rounded-full mr-1.5"
+                        style={{ backgroundColor: zone.color }}
+                      ></span>
+                      <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                        {zone.name}
                       </span>
-                    )}
-                  </div>
-                </label>
-              ))}
-            </div>
+                      {disasters.some(disaster => 
+                        (zoneToDistrictMap[disaster.location] === zone.name || disaster.location === zone.name)
+                      ) && (
+                        <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                          {disasters.filter(disaster => 
+                            zoneToDistrictMap[disaster.location] === zone.name || 
+                            disaster.location === zone.name
+                          ).length} alerte(s)
+                        </span>
+                      )}
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
           </div>
           
           {/* Couches de carte */}
@@ -204,13 +210,13 @@ const MapPage: React.FC = () => {
               Alertes actives sur la carte
             </h3>
             
-            {loading ? (
+            {disastersLoading ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
                 <span className="ml-2 text-sm">Chargement des catastrophes...</span>
               </div>
-            ) : error ? (
-              <p className="text-red-500 text-sm">Erreur de chargement: {error.message}</p>
+            ) : disastersError ? (
+              <p className="text-red-500 text-sm">Erreur de chargement: {disastersError.message}</p>
             ) : disasters.filter(disaster => 
               selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
             ).length > 0 ? (
@@ -254,6 +260,8 @@ const MapPage: React.FC = () => {
               selectedLayers={selectedLayers}
               activeAlerts={disasters}
               zoneToDistrictMap={zoneToDistrictMap}
+              zones={zones}
+              zonesLoading={zonesLoading}
             />
           </div>
         </div>
