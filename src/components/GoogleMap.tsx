@@ -12,12 +12,14 @@ interface GoogleMapProps {
   selectedZones: string[];
   selectedLayers: string[];
   activeAlerts: any[];
+  zoneToDistrictMap?: Record<string, string>; // Add this prop
 }
 
 const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, activeAlerts }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const [map, setMap] = useState<any>(null);
   const [markers, setMarkers] = useState<any[]>([]);
+  const [districtPolygons, setDistrictPolygons] = useState<any[]>([]);
   
   const lyonCoordinates = { lat: 45.764043, lng: 4.835659 }; // Lyon, France coordinates
   
@@ -52,12 +54,15 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
         
         const newMap = new google.maps.Map(mapRef.current, mapOptions);
         setMap(newMap);
+        
+        // Draw district boundaries once map is loaded
+        drawDistrictBoundaries(newMap);
       }
     };
 
     if (!window.google) {
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBhtMVuPCeEo_HG2TDjWsR6-1AoUsOvpzE&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyBhtMVuPCeEo_HG2TDjWsR6-1AoUsOvpzE&libraries=places,drawing,geometry`;
       script.async = true;
       script.defer = true;
       script.onload = initMap;
@@ -70,6 +75,238 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
       initMap();
     }
   }, []);
+  
+  // Draw district boundaries based on the image
+  const drawDistrictBoundaries = (map: any) => {
+    // Clear any existing district polygons
+    districtPolygons.forEach(polygon => polygon.setMap(null));
+    
+    // Define district polygons based on the image
+    const districts = [
+      // District 1 (Green - Presqu'île)
+      {
+        name: 'Presqu\'île',
+        id: 1,
+        color: '#4ADE80', // Green
+        textColor: '#166534',
+        coordinates: [
+          { lat: 45.7650, lng: 4.8310 },
+          { lat: 45.7680, lng: 4.8360 },
+          { lat: 45.7650, lng: 4.8380 },
+          { lat: 45.7620, lng: 4.8350 },
+          { lat: 45.7610, lng: 4.8330 },
+          { lat: 45.7630, lng: 4.8300 },
+        ]
+      },
+      
+      // District 2 (Green - Confluence)
+      {
+        name: 'Confluence',
+        id: 2,
+        color: '#86EFAC', // Light Green
+        textColor: '#166534',
+        coordinates: [
+          { lat: 45.7600, lng: 4.8290 },
+          { lat: 45.7610, lng: 4.8330 },
+          { lat: 45.7590, lng: 4.8350 },
+          { lat: 45.7560, lng: 4.8340 },
+          { lat: 45.7530, lng: 4.8310 },
+          { lat: 45.7540, lng: 4.8260 },
+          { lat: 45.7570, lng: 4.8270 },
+        ]
+      },
+      
+      // District 3 (Blue - Part-Dieu)
+      {
+        name: 'Part-Dieu',
+        id: 3,
+        color: '#38BDF8', // Blue
+        textColor: '#0369A1',
+        coordinates: [
+          { lat: 45.7660, lng: 4.8380 },
+          { lat: 45.7680, lng: 4.8430 },
+          { lat: 45.7700, lng: 4.8500 },
+          { lat: 45.7680, lng: 4.8550 },
+          { lat: 45.7660, lng: 4.8600 },
+          { lat: 45.7620, lng: 4.8650 },
+          { lat: 45.7580, lng: 4.8700 },
+          { lat: 45.7550, lng: 4.8650 },
+          { lat: 45.7560, lng: 4.8580 },
+          { lat: 45.7580, lng: 4.8520 },
+          { lat: 45.7590, lng: 4.8450 },
+          { lat: 45.7640, lng: 4.8400 },
+        ]
+      },
+      
+      // District 4 (Green - Croix-Rousse)
+      {
+        name: 'Croix-Rousse',
+        id: 4,
+        color: '#4ADE80', // Green
+        textColor: '#166534',
+        coordinates: [
+          { lat: 45.7730, lng: 4.8250 },
+          { lat: 45.7780, lng: 4.8300 },
+          { lat: 45.7790, lng: 4.8370 },
+          { lat: 45.7750, lng: 4.8400 },
+          { lat: 45.7700, lng: 4.8380 },
+          { lat: 45.7680, lng: 4.8360 },
+          { lat: 45.7650, lng: 4.8320 },
+          { lat: 45.7670, lng: 4.8280 },
+          { lat: 45.7700, lng: 4.8260 },
+        ]
+      },
+      
+      // District 5 (Orange - Old Lyon / Fourvière)
+      {
+        name: 'Vieux Lyon / Fourvière',
+        id: 5,
+        color: '#FB923C', // Orange
+        textColor: '#9A3412',
+        coordinates: [
+          { lat: 45.7630, lng: 4.8290 },
+          { lat: 45.7600, lng: 4.8280 },
+          { lat: 45.7570, lng: 4.8270 },
+          { lat: 45.7540, lng: 4.8200 },
+          { lat: 45.7520, lng: 4.8150 },
+          { lat: 45.7550, lng: 4.8100 },
+          { lat: 45.7600, lng: 4.8080 },
+          { lat: 45.7650, lng: 4.8100 },
+          { lat: 45.7680, lng: 4.8150 },
+          { lat: 45.7690, lng: 4.8200 },
+          { lat: 45.7670, lng: 4.8250 },
+          { lat: 45.7650, lng: 4.8280 },
+        ]
+      },
+      
+      // District 6 (Blue - Brotteaux)
+      {
+        name: 'Brotteaux',
+        id: 6,
+        color: '#0EA5E9', // Blue
+        textColor: '#0369A1',
+        coordinates: [
+          { lat: 45.7700, lng: 4.8380 },
+          { lat: 45.7740, lng: 4.8400 },
+          { lat: 45.7780, lng: 4.8450 },
+          { lat: 45.7760, lng: 4.8500 },
+          { lat: 45.7720, lng: 4.8520 },
+          { lat: 45.7680, lng: 4.8480 },
+          { lat: 45.7650, lng: 4.8430 },
+          { lat: 45.7680, lng: 4.8400 },
+        ]
+      },
+      
+      // District 7 (Blue - Guillotière)
+      {
+        name: 'Guillotière',
+        id: 7,
+        color: '#7DD3FC', // Light Blue
+        textColor: '#0369A1',
+        coordinates: [
+          { lat: 45.7590, lng: 4.8350 },
+          { lat: 45.7640, lng: 4.8400 },
+          { lat: 45.7590, lng: 4.8450 },
+          { lat: 45.7550, lng: 4.8580 },
+          { lat: 45.7500, lng: 4.8500 },
+          { lat: 45.7480, lng: 4.8400 },
+          { lat: 45.7510, lng: 4.8330 },
+          { lat: 45.7530, lng: 4.8310 },
+          { lat: 45.7560, lng: 4.8340 },
+        ]
+      },
+      
+      // District 8 (Blue - Monplaisir)
+      {
+        name: 'Monplaisir',
+        id: 8,
+        color: '#BAE6FD', // Very Light Blue
+        textColor: '#0369A1',
+        coordinates: [
+          { lat: 45.7550, lng: 4.8580 },
+          { lat: 45.7580, lng: 4.8650 },
+          { lat: 45.7600, lng: 4.8750 },
+          { lat: 45.7550, lng: 4.8850 },
+          { lat: 45.7480, lng: 4.8800 },
+          { lat: 45.7450, lng: 4.8650 },
+          { lat: 45.7480, lng: 4.8580 },
+          { lat: 45.7500, lng: 4.8500 },
+        ]
+      },
+      
+      // District 9 (Orange - Vaise)
+      {
+        name: 'Vaise',
+        id: 9,
+        color: '#FDBA74', // Light Orange
+        textColor: '#9A3412',
+        coordinates: [
+          { lat: 45.7680, lng: 4.8150 },
+          { lat: 45.7700, lng: 4.8100 },
+          { lat: 45.7750, lng: 4.8080 },
+          { lat: 45.7800, lng: 4.8150 },
+          { lat: 45.7820, lng: 4.8200 },
+          { lat: 45.7780, lng: 4.8300 },
+          { lat: 45.7740, lng: 4.8250 },
+          { lat: 45.7700, lng: 4.8260 },
+          { lat: 45.7670, lng: 4.8250 },
+          { lat: 45.7690, lng: 4.8200 },
+        ]
+      },
+    ];
+    
+    const polygons = districts.map(district => {
+      // Create the polygon for this district
+      const polygon = new google.maps.Polygon({
+        paths: district.coordinates,
+        strokeColor: '#FFFFFF',
+        strokeOpacity: 0.8,
+        strokeWeight: 2,
+        fillColor: district.color,
+        fillOpacity: 0.5,
+        map,
+        zIndex: 1
+      });
+      
+      // Add district number label at the center
+      const bounds = new google.maps.LatLngBounds();
+      district.coordinates.forEach(coord => bounds.extend(coord));
+      const center = bounds.getCenter();
+      
+      const marker = new google.maps.Marker({
+        position: center,
+        map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 0, // Hide the default marker
+          strokeWeight: 0
+        },
+        label: {
+          text: district.id.toString(),
+          color: district.textColor,
+          fontSize: '16px',
+          fontWeight: 'bold'
+        },
+        title: district.name,
+        zIndex: 2
+      });
+      
+      // Add click listener to show district info
+      polygon.addListener('click', () => {
+        const infoWindow = new google.maps.InfoWindow({
+          content: `<div style="padding: 10px;">
+            <h3 style="margin: 0 0 5px;">District ${district.id}: ${district.name}</h3>
+          </div>`,
+          position: center
+        });
+        infoWindow.open(map);
+      });
+      
+      return [polygon, marker];
+    }).flat();
+    
+    setDistrictPolygons(polygons);
+  };
 
   // Update markers when selectedZones, selectedLayers, or activeAlerts change
   useEffect(() => {
@@ -239,19 +476,39 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
     
     // Add alert markers based on active alerts
     if (selectedLayers.includes('alerts')) {
-      // Map zones to Lyon neighborhoods
-      const zoneToCoordinates: Record<string, { lat: number; lng: number }> = {
-        'Downtown': { lat: 45.7620, lng: 4.8350 },
-        'Riverside': { lat: 45.7550, lng: 4.8280 },
-        'North County': { lat: 45.7760, lng: 4.8420 },
-        'East Side': { lat: 45.7590, lng: 4.8750 },
-        'West Hills': { lat: 45.7680, lng: 4.8080 }
+      // Create a mapping from district names to coordinates for alert placement
+      const districtToCoordinates: Record<string, { lat: number; lng: number }> = {
+        "Presqu'île": { lat: 45.7630, lng: 4.8320 },
+        "Confluence": { lat: 45.7570, lng: 4.8280 },
+        "Part-Dieu": { lat: 45.7660, lng: 4.8520 },
+        "Croix-Rousse": { lat: 45.7730, lng: 4.8350 },
+        "Vieux Lyon / Fourvière": { lat: 45.7610, lng: 4.8180 },
+        "Brotteaux": { lat: 45.7700, lng: 4.8450 },
+        "Guillotière": { lat: 45.7540, lng: 4.8420 },
+        "Monplaisir": { lat: 45.7520, lng: 4.8650 },
+        "Vaise": { lat: 45.7730, lng: 4.8180 }
+      };
+      
+      // Legacy zone mapping (keeping for compatibility with existing alerts)
+      const zoneToDistrictMap: Record<string, string> = {
+        'Downtown': "Presqu'île",
+        'Riverside': 'Confluence',
+        'North County': 'Croix-Rousse',
+        'East Side': 'Part-Dieu',
+        'West Hills': 'Vieux Lyon / Fourvière'
       };
       
       activeAlerts
-        .filter(alert => selectedZones.includes(alert.location))
+        .filter(alert => {
+          const districtName = zoneToDistrictMap[alert.location] || alert.location;
+          return selectedZones.includes(districtName);
+        })
         .forEach(alert => {
-          const coordinates = zoneToCoordinates[alert.location] || lyonCoordinates;
+          // Map the alert location to district name
+          const districtName = zoneToDistrictMap[alert.location] || alert.location;
+          
+          // Get coordinates for this district
+          const coordinates = districtToCoordinates[districtName] || lyonCoordinates;
           
           // Set color based on alert level
           let color = '#22c55e'; // safe - green
@@ -269,7 +526,8 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
               fillColor: color,
               fillOpacity: 0.8,
               strokeWeight: 0
-            }
+            },
+            zIndex: 100 // Make sure alerts appear above district polygons
           });
           
           // Add pulse animation to emergency alerts
@@ -290,7 +548,7 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
           
           // Add info window
           const infoWindow = new google.maps.InfoWindow({
-            content: `<div><strong>${alert.title}</strong><br/>${alert.location}</div>`
+            content: `<div><strong>${alert.title}</strong><br/>${districtName}</div>`
           });
           
           alertMarker.addListener("click", () => {
