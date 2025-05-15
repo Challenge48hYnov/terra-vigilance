@@ -34,14 +34,16 @@ export function useDisasters() {
         const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
         const supabase = createClient(supabaseUrl, supabaseKey);
 
-        // Récupérer les catastrophes où end_date est null (catastrophes en cours)
+        const currentDate = new Date().toISOString();
+
+        // Récupérer les catastrophes où end_date est null OU supérieure à la date actuelle
         const { data, error } = await supabase
           .from('disasters')
           .select(`
             *,
             zones (name)
           `)
-          .is('end_date', null)
+          .or(`end_date.is.null,end_date.gt.${currentDate}`)
           .in('disaster_type', ['flood', 'earthquake']);
 
         if (error) throw error;

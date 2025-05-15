@@ -20,13 +20,6 @@ const MapPage: React.FC = () => {
   const [selectedDisasterTypes, setSelectedDisasterTypes] = useState<string[]>(['flood', 'earthquake']);
   
   // Sélectionner les trois premiers districts par défaut quand ils sont chargés
-  React.useEffect(() => {
-    if (zones.length > 0 && selectedDistricts.length === 0) {
-      const initialDistricts = zones.slice(0, 3).map(zone => zone.name);
-      setSelectedDistricts(initialDistricts);
-    }
-  }, [zones]);
-  
   const toggleDistrict = (district: string) => {
     if (selectedDistricts.includes(district)) {
       setSelectedDistricts(selectedDistricts.filter(d => d !== district));
