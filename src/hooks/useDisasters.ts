@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { createClient } from '@supabase/supabase-js';
-
-// Définissez les types pour vos données avec uniquement flood et earthquake
 export interface Disaster {
   id: number;
   name: string;
-  disaster_type: 'flood' | 'earthquake'; // Restreint uniquement à ces deux types
+  disaster_type: 'flood' | 'earthquake';
   description: string;
   start_date: string;
   end_date: string | null;
@@ -18,8 +16,7 @@ export interface Disaster {
   };
   is_prediction: boolean;
   zone_id: number;
-  // Propriétés supplémentaires pour compatibilité avec l'interface d'alerte existante
-  level: 'emergency' | 'danger' | 'warning' | 'safe';
+  level: 'emergency'; 
   location: string;
   title: string;
   message: string;
@@ -38,7 +35,6 @@ export function useDisasters() {
         const supabase = createClient(supabaseUrl, supabaseKey);
 
         // Récupérer les catastrophes où end_date est null (catastrophes en cours)
-        // Et uniquement de type 'flood' ou 'earthquake'
         const { data, error } = await supabase
           .from('disasters')
           .select(`
@@ -53,9 +49,6 @@ export function useDisasters() {
         if (data) {
           // Transformer les données pour correspondre au format attendu par le composant GoogleMap
           const formattedDisasters = data.map(disaster => {
-            // Toujours utiliser le niveau d'urgence pour tous les types de catastrophes
-            const level: 'emergency' | 'danger' | 'warning' | 'safe' = 'emergency';
-
             return {
               id: disaster.id,
               name: disaster.name,
@@ -67,8 +60,8 @@ export function useDisasters() {
               is_prediction: disaster.is_prediction,
               zone_id: disaster.zone_id,
               // Propriétés pour compatibilité avec le système d'alerte
-              level, // Toujours emergency
-              location: disaster.zones?.name || 'Unknown',
+              level: 'emergency' as 'emergency',
+              location: disaster.zones?.name || 'Inconnu',
               title: disaster.name || `${disaster.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'}`,
               message: disaster.description || 
                       `${disaster.disaster_type === 'flood' ? 'Zone inondée' : 'Zone affectée par un séisme'}`
@@ -78,7 +71,7 @@ export function useDisasters() {
           setDisasters(formattedDisasters);
         }
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('An unknown error occurred'));
+        setError(err instanceof Error ? err : new Error('Une erreur inconnue est survenue'));
       } finally {
         setLoading(false);
       }
@@ -86,7 +79,7 @@ export function useDisasters() {
 
     fetchDisasters();
 
-    // Optionnel : configurer une mise à jour périodique
+    // Rafraîchissement périodique des données
     const intervalId = setInterval(fetchDisasters, 60000); // Rafraîchir toutes les minutes
     
     return () => clearInterval(intervalId);

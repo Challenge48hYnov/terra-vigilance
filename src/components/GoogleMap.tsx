@@ -633,33 +633,6 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
             }
         }
 
-        // Add road closures
-        if (selectedLayers.includes('roads')) {
-            const roadClosures = [
-                [
-                    { lat: 45.7600, lng: 4.8360 },
-                    { lat: 45.7640, lng: 4.8420 }
-                ],
-                [
-                    { lat: 45.7730, lng: 4.8320 },
-                    { lat: 45.7780, lng: 4.8320 }
-                ]
-            ];
-
-            roadClosures.forEach(path => {
-                const roadLine = new google.maps.Polyline({
-                    path,
-                    geodesic: true,
-                    strokeColor: '#ef4444',
-                    strokeOpacity: 1.0,
-                    strokeWeight: 4,
-                    map
-                });
-
-                newMarkers.push(roadLine as any);
-            });
-        }
-
         // Add alert markers based on active alerts
         if (selectedLayers.includes('alerts')) {
             // Create a mapping from district names to coordinates for alert placement
@@ -727,17 +700,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
                     };
                     requestAnimationFrame(animationStep);
 
-                    // Modifier l'info window pour inclure le niveau d'urgence
+                    // Modifier l'info window pour ne plus afficher le niveau d'alerte
                     const infoWindow = new google.maps.InfoWindow({
                         content: `
                         <div style="padding: 5px;">
                             <strong>${alert.title}</strong><br/>
                             <span style="color: ${color}; font-weight: bold;">
                                 Type: ${alert.disaster_type === 'flood' ? 'Inondation' : 'Tremblement de terre'}
-                            </span>
-                            <br/>
-                            <span style="color: #dc2626; font-weight: bold;">
-                                Niveau: Emergency
                             </span>
                             <br/>
                             <span>District: ${districtName}</span>

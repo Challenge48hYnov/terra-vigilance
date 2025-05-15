@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
 import { 
   Map as MapIcon, Layers, AlertTriangle, Info, Home, 
-  Navigation, List, ChevronDown, ChevronUp 
+  Navigation, List, ChevronDown, ChevronUp, Loader2 
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GoogleMap from '../components/GoogleMap';
-import { useDisasters } from '../hooks/useDisasters'; // Import du nouveau hook
-import { Loader2 } from 'lucide-react'; // Pour afficher un loader pendant le chargement
+import { useDisasters } from '../hooks/useDisasters';
 
-// Lyon districts data for filtering
+// Données des quartiers de Lyon pour le filtrage
 const lyonDistricts = [
   { id: 1, name: "Presqu'île", color: "#4ADE80" },
   { id: 2, name: "Confluence", color: "#86EFAC" },
@@ -22,7 +21,7 @@ const lyonDistricts = [
 ];
 
 const MapPage: React.FC = () => {
-  // Utiliser le hook pour récupérer les catastrophes
+  // Utilisation du hook pour récupérer les catastrophes
   const { disasters, loading, error } = useDisasters();
   
   const [showLegend, setShowLegend] = useState(true);
@@ -47,7 +46,7 @@ const MapPage: React.FC = () => {
     }
   };
   
-  // Map legacy zone names to district names for alerts compatibility
+  // Correspondance entre les anciennes zones et les noms de quartiers pour compatibilité
   const zoneToDistrictMap: Record<string, string> = {
     'Downtown': "Presqu'île",
     'Riverside': 'Confluence',
@@ -56,26 +55,26 @@ const MapPage: React.FC = () => {
     'West Hills': 'Vieux Lyon / Fourvière'
   };
   
-  // Available map layers
+  // Couches de carte disponibles
   const availableLayers = [
-    { id: 'alerts', name: 'Active Alerts', icon: <AlertTriangle size={16} /> },
-    { id: 'resources', name: 'Emergency Resources', icon: <Info size={16} /> },
-    { id: 'shelters', name: 'Shelters', icon: <Home size={16} /> },
+    { id: 'alerts', name: 'Alertes actives', icon: <AlertTriangle size={16} /> },
+    { id: 'resources', name: 'Ressources d\'urgence', icon: <Info size={16} /> },
+    { id: 'shelters', name: 'Abris', icon: <Home size={16} /> },
   ];
 
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Hazard Map</h1>
+        <h1 className="text-3xl font-bold mb-2">Carte des risques</h1>
         <p className="text-neutral-600 dark:text-neutral-400">
-          Interactive map showing affected areas and safety information
+          Carte interactive montrant les zones affectées et les informations de sécurité
         </p>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Map Controls and Filters */}
+        {/* Contrôles et filtres de carte */}
         <div className="md:col-span-1 space-y-4">
-          {/* Zones Filter */}
+          {/* Filtre de zones */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
             <button 
               className="w-full px-4 py-3 flex justify-between items-center border-b border-gray-200 dark:border-neutral-700"
@@ -83,7 +82,7 @@ const MapPage: React.FC = () => {
             >
               <div className="flex items-center">
                 <MapIcon size={18} className="mr-2 text-primary-600 dark:text-primary-400" />
-                <span className="font-medium">Map Legend & Filters</span>
+                <span className="font-medium">Légende & Filtres</span>
               </div>
               {showLegend ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
             </button>
@@ -100,12 +99,12 @@ const MapPage: React.FC = () => {
                   <div className="mb-4">
                     <h3 className="font-medium mb-2 flex items-center">
                       <AlertTriangle size={16} className="mr-1 text-red-600 dark:text-red-400" />
-                      Disaster Alerts
+                      Alertes de catastrophes
                     </h3>
                     <div className="space-y-2 pl-6">
                       <div className="flex items-center">
                         <span className="w-4 h-4 bg-red-600 rounded-full mr-2"></span>
-                        <span className="text-sm">Active disaster area</span>
+                        <span className="text-sm">Zone de catastrophe active</span>
                       </div>
                     </div>
                   </div>
@@ -113,20 +112,20 @@ const MapPage: React.FC = () => {
                   <div className="mb-4">
                     <h3 className="font-medium mb-2 flex items-center">
                       <Home size={16} className="mr-1 text-blue-600 dark:text-blue-400" />
-                      Resources
+                      Ressources
                     </h3>
                     <div className="space-y-2 pl-6">
                       <div className="flex items-center">
                         <span className="w-4 h-4 flex items-center justify-center bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full mr-2">H</span>
-                        <span className="text-sm">Hospital</span>
+                        <span className="text-sm">Hôpital</span>
                       </div>
                       <div className="flex items-center">
                         <span className="w-4 h-4 flex items-center justify-center bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-400 rounded-full mr-2">S</span>
-                        <span className="text-sm">Shelter</span>
+                        <span className="text-sm">Abri</span>
                       </div>
                       <div className="flex items-center">
                         <span className="w-4 h-4 flex items-center justify-center bg-purple-100 dark:bg-purple-900 text-purple-600 dark:text-purple-400 rounded-full mr-2">F</span>
-                        <span className="text-sm">Food & Water</span>
+                        <span className="text-sm">Nourriture & Eau</span>
                       </div>
                     </div>
                   </div>
@@ -135,11 +134,11 @@ const MapPage: React.FC = () => {
             </AnimatePresence>
           </div>
           
-          {/* Districts Filter */}
+          {/* Filtre des quartiers */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
               <Navigation size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
-              Lyon Districts
+              Quartiers de Lyon
             </h3>
             <div className="space-y-2">
               {lyonDistricts.map(district => (
@@ -165,7 +164,7 @@ const MapPage: React.FC = () => {
                         {disasters.filter(disaster => 
                           zoneToDistrictMap[disaster.location] === district.name || 
                           disaster.location === district.name
-                        ).length} alert(s)
+                        ).length} alerte(s)
                       </span>
                     )}
                   </div>
@@ -174,11 +173,11 @@ const MapPage: React.FC = () => {
             </div>
           </div>
           
-          {/* Map Layers */}
+          {/* Couches de carte */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
               <Layers size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
-              Map Layers
+              Couches de carte
             </h3>
             <div className="space-y-2">
               {availableLayers.map(layer => (
@@ -198,20 +197,20 @@ const MapPage: React.FC = () => {
             </div>
           </div>
           
-          {/* Active Alerts in Map */}
+          {/* Alertes actives sur la carte */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
               <List size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
-              Active Alerts on Map
+              Alertes actives sur la carte
             </h3>
             
             {loading ? (
               <div className="flex items-center justify-center p-4">
                 <Loader2 className="h-5 w-5 animate-spin text-primary-600" />
-                <span className="ml-2 text-sm">Loading disasters...</span>
+                <span className="ml-2 text-sm">Chargement des catastrophes...</span>
               </div>
             ) : error ? (
-              <p className="text-red-500 text-sm">Error loading disasters: {error.message}</p>
+              <p className="text-red-500 text-sm">Erreur de chargement: {error.message}</p>
             ) : disasters.filter(disaster => 
               selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
             ).length > 0 ? (
@@ -241,19 +240,19 @@ const MapPage: React.FC = () => {
               </div>
             ) : (
               <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-                No alerts in selected districts
+                Aucune alerte dans les quartiers sélectionnés
               </p>
             )}
           </div>
         </div>
         
-        {/* Map Container */}
+        {/* Conteneur de carte */}
         <div className="md:col-span-2">
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
             <GoogleMap 
               selectedZones={selectedDistricts}
               selectedLayers={selectedLayers}
-              activeAlerts={disasters} // Utiliser les catastrophes depuis Supabase
+              activeAlerts={disasters}
               zoneToDistrictMap={zoneToDistrictMap}
             />
           </div>
