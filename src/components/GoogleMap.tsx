@@ -702,6 +702,13 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
                     if (alert.level === 'danger') color = '#ea580c'; // orange
                     if (alert.level === 'warning') color = '#f59e0b'; // amber
 
+                    // Formatage du niveau d'alerte pour l'affichage
+                    let levelText = 'Information';
+                    if (alert.level === 'emergency') levelText = 'Urgence';
+                    if (alert.level === 'danger') levelText = 'Danger';
+                    if (alert.level === 'warning') levelText = 'Avertissement';
+                    if (alert.level === 'safe') levelText = 'Zone sécurisée';
+
                     const alertMarker = new google.maps.Marker({
                         position: coordinates,
                         map,
@@ -732,9 +739,16 @@ const GoogleMap: React.FC<GoogleMapProps> = ({ selectedZones, selectedLayers, ac
                         requestAnimationFrame(animationStep);
                     }
 
-                    // Add info window
+                    // Add info window with alert type included
                     const infoWindow = new google.maps.InfoWindow({
-                        content: `<div><strong>${alert.title}</strong><br/>${districtName}</div>`
+                        content: `
+                <div style="padding: 5px;">
+                    <strong>${alert.title}</strong><br/>
+                    <span style="color: ${color}; font-weight: bold;">Type: ${levelText}</span><br/>
+                    <span>District: ${districtName}</span>
+                    ${alert.message ? `<p style="margin-top: 5px; margin-bottom: 0;">${alert.message}</p>` : ''}
+                </div>
+            `
                     });
 
                     alertMarker.addListener("click", () => {
