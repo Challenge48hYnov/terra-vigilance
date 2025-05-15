@@ -190,12 +190,12 @@ const ActivitiesPage: React.FC = () => {
                       </div>
                       <div className="flex items-center">
                         <Calendar size={14} className="mr-2" />
-                        <span>{new Date(activity.start_date).toLocaleString()}</span>
+                        <span>Start: {new Date(activity.start_date).toLocaleString()}</span>
                       </div>
                       {activity.end_date && (
                         <div className="flex items-center">
                           <Calendar size={14} className="mr-2" />
-                          <span>{new Date(activity.end_date).toLocaleDateString()}</span>
+                          <span>End: {new Date(activity.end_date).toLocaleDateString()}</span>
                         </div>
                       )}
                     </div>
