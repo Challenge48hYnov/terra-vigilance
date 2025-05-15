@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   Map as MapIcon, Layers, AlertTriangle, Info, Home, 
-  Navigation, List, ChevronDown, ChevronUp, Loader2 
+  Navigation, List, ChevronDown, ChevronUp, Loader2, Waves, Mountain
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import GoogleMap from '../components/GoogleMap';
@@ -17,6 +17,7 @@ const MapPage: React.FC = () => {
   const [showLegend, setShowLegend] = useState(true);
   const [selectedDistricts, setSelectedDistricts] = useState<string[]>([]);
   const [selectedLayers, setSelectedLayers] = useState<string[]>(['alerts', 'flood', 'roads']);
+  const [selectedDisasterTypes, setSelectedDisasterTypes] = useState<string[]>(['flood', 'earthquake']);
   
   // Sélectionner les trois premiers districts par défaut quand ils sont chargés
   React.useEffect(() => {
@@ -41,6 +42,19 @@ const MapPage: React.FC = () => {
       setSelectedLayers([...selectedLayers, layer]);
     }
   };
+
+  const toggleDisasterType = (type: string) => {
+    if (selectedDisasterTypes.includes(type)) {
+      setSelectedDisasterTypes(selectedDisasterTypes.filter(t => t !== type));
+    } else {
+      setSelectedDisasterTypes([...selectedDisasterTypes, type]);
+    }
+  };
+  
+  // Filtrer les catastrophes en fonction des types sélectionnés
+  const filteredDisasters = disasters.filter(disaster => 
+    selectedDisasterTypes.includes(disaster.disaster_type)
+  );
   
   // Correspondance entre les anciennes zones et les noms de quartiers pour compatibilité
   const zoneToDistrictMap: Record<string, string> = {
@@ -56,6 +70,12 @@ const MapPage: React.FC = () => {
     { id: 'alerts', name: 'Alertes actives', icon: <AlertTriangle size={16} /> },
     { id: 'resources', name: 'Ressources d\'urgence', icon: <Info size={16} /> },
     { id: 'shelters', name: 'Abris', icon: <Home size={16} /> },
+  ];
+
+  // Types de catastrophes disponibles
+  const disasterTypes = [
+    { id: 'flood', name: 'Inondations', icon: <Waves size={16} /> },
+    { id: 'earthquake', name: 'Tremblements de terre', icon: <Mountain size={16} /> },
   ];
 
   return (
@@ -130,6 +150,30 @@ const MapPage: React.FC = () => {
             </AnimatePresence>
           </div>
           
+          {/* Filtre de type de catastrophes */}
+          <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
+            <h3 className="font-medium mb-3 flex items-center">
+              <AlertTriangle size={16} className="mr-2 text-primary-600 dark:text-primary-400" />
+              Types de catastrophes
+            </h3>
+            <div className="space-y-2">
+              {disasterTypes.map(type => (
+                <label key={type.id} className="flex items-center">
+                  <input
+                    type="checkbox"
+                    checked={selectedDisasterTypes.includes(type.id)}
+                    onChange={() => toggleDisasterType(type.id)}
+                    className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                  />
+                  <span className="ml-2 flex items-center text-sm text-neutral-700 dark:text-neutral-300">
+                    <span className="mr-1">{type.icon}</span>
+                    {type.name}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+          
           {/* Filtre des quartiers */}
           <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
             <h3 className="font-medium mb-3 flex items-center">
@@ -162,11 +206,11 @@ const MapPage: React.FC = () => {
                       <span className="text-sm text-neutral-700 dark:text-neutral-300">
                         {zone.name}
                       </span>
-                      {disasters.some(disaster => 
+                      {filteredDisasters.some(disaster => 
                         (zoneToDistrictMap[disaster.location] === zone.name || disaster.location === zone.name)
                       ) && (
                         <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
-                          {disasters.filter(disaster => 
+                          {filteredDisasters.filter(disaster => 
                             zoneToDistrictMap[disaster.location] === zone.name || 
                             disaster.location === zone.name
                           ).length} alerte(s)
@@ -217,11 +261,11 @@ const MapPage: React.FC = () => {
               </div>
             ) : disastersError ? (
               <p className="text-red-500 text-sm">Erreur de chargement: {disastersError.message}</p>
-            ) : disasters.filter(disaster => 
+            ) : filteredDisasters.filter(disaster => 
               selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
             ).length > 0 ? (
               <div className="space-y-3">
-                {disasters
+                {filteredDisasters
                   .filter(disaster => 
                     selectedDistricts.includes(zoneToDistrictMap[disaster.location] || disaster.location)
                   )
@@ -246,7 +290,7 @@ const MapPage: React.FC = () => {
               </div>
             ) : (
               <p className="text-neutral-600 dark:text-neutral-400 text-sm">
-                Aucune alerte dans les quartiers sélectionnés
+                Aucune alerte dans les quartiers sélectionnés ou pour les types choisis
               </p>
             )}
           </div>
@@ -258,7 +302,7 @@ const MapPage: React.FC = () => {
             <GoogleMap 
               selectedZones={selectedDistricts}
               selectedLayers={selectedLayers}
-              activeAlerts={disasters}
+              activeAlerts={filteredDisasters}
               zoneToDistrictMap={zoneToDistrictMap}
               zones={zones}
               zonesLoading={zonesLoading}
