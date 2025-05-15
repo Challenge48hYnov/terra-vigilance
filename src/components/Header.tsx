@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, Bell, Sun, Moon, AlertTriangle } from 'lucide-react';
 import { useAlertContext } from '../contexts/AlertContext';
+import { useTranslation } from 'react-i18next';
+
 
 interface HeaderProps {
   onMenuToggle: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
+  const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { activeAlerts } = useAlertContext();
@@ -68,7 +71,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
           
           <Link to="/" className="flex items-center">
             <AlertTriangle size={24} className="text-danger mr-2" />
-            <span className="text-xl font-bold">DisasterAlert</span>
+            <span className="text-xl font-bold">t{("appName")}</span>
           </Link>
         </div>
         
@@ -88,7 +91,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
           <button
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
             onClick={toggleDarkMode}
-            aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={darkMode ? t("switchToLightMode") : t("switchToDarkMode")}
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
