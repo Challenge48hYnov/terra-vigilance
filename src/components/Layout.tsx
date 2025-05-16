@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import Footer from './Footer';
 import EmergencyBanner from './EmergencyBanner';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,6 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hasEmergency, setHasEmergency] = useState(false);
   const location = useLocation();
+  const { t } = useTranslation();
 
   // Close sidebar when route changes on mobile
   useEffect(() => {
@@ -34,7 +36,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex min-h-screen flex-col">
       {hasEmergency && (
         <EmergencyBanner
-          message="EMERGENCY ALERT: Flash flooding reported in downtown area. Seek higher ground immediately."
+          message={t("emergencyAlert")}
           level="emergency"
         />
       )}

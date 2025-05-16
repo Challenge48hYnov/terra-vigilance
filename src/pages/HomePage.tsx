@@ -75,24 +75,24 @@ const HomePage: React.FC = () => {
               </div>
             </Link>
           </motion.div>
-          
+
           <motion.div variants={itemVariants}>
-            <Link 
-              to="/resources" 
+            <Link
+              to="/resources"
               className="block bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
             >
               <div className="flex flex-col items-center text-center">
                 <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mb-4">
                   <Shield size={24} className="text-purple-600 dark:text-purple-400" />
                 </div>
-                <h3 className="text-lg font-medium mb-2">Emergency Resources</h3>
+                <h3 className="text-lg font-medium mb-2">{t("emergencyRessources")}</h3>
                 <p className="text-neutral-600 dark:text-neutral-400">
-                  Find shelters, medical help, and supplies near you
+                  {t("lr_desc")}
                 </p>
               </div>
             </Link>
           </motion.div>
-          
+
           <motion.div variants={itemVariants}>
             <Link
               to="/chat"
@@ -110,7 +110,7 @@ const HomePage: React.FC = () => {
             </Link>
           </motion.div>
         </motion.div>
-        
+
         {/* Resources */}
         <div>
           <h2 className="text-2xl font-bold mb-4">{t("emergencyRessources")}</h2>
@@ -127,8 +127,8 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <Link 
-                to="/resources" 
+              <Link
+                to="/resources"
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm"
               >
                 {t("learn")}

@@ -92,5 +92,6 @@
     "chatGuidelinesText2": "Partagez vos information sur les conditions d'urgences.",
     "chatGuidelinesText3": "Coordonées les ressources et venez en aide à vos voisins.",
     "chatGuidelinesText4": "Signalez les conditions dangereuses au autorité compétente.",
-    "zone": "Choississez une zone"
+    "zone": "Choississez une zone",
+    "emergencyAlert": "Alerte d'urgence: Des crues soudaines ont été signalées dans le centre-ville. Trouvez immédiatement un terrain plus élevé."
 }

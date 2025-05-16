@@ -92,5 +92,6 @@
   "chatGuidelinesText2": "Share accurate information about emergency conditions.",
   "chatGuidelinesText3": "Coordinate resources and assistance with your neighbors.",
   "chatGuidelinesText4": "Report dangerous conditions to emergency services.",
-  "zone": "Choose a zone"
+  "zone": "Choose a zone",
+  "emergencyAlert": "EMERGENCY ALERT: Flash flooding reported in downtown area. Seek higher ground immediately."
 }
