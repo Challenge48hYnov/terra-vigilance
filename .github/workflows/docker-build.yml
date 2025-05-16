@@ -28,6 +28,9 @@ jobs:
         echo "VITE_SUPABASE_ANON_KEY=${{ secrets.VITE_SUPABASE_ANON_KEY }}" >> .env
         echo "VITE_SUPABASE_URL=${{ secrets.VITE_SUPABASE_URL }}" >> .env
 
+    - name: Check .env contents
+      run: cat .env
+
     - name: Build and push Docker image
       run: |
         export $(cat .env | xargs) && \
