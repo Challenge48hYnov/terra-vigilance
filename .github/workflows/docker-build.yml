@@ -45,3 +45,10 @@ jobs:
         az container restart \
           --name terra-vigilance \
           --resource-group RG48h
+
+    - name: Inspect built files inside Docker image
+      run: |
+        docker run --rm acr48h.azurecr.io/terra-vigilance:v1 grep -r 'supabase' /usr/share/nginx/html
+
+
+    
