@@ -88,26 +88,6 @@ const ActivitiesPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Filters and Search */}
-      <div className="mb-6 bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
-        <div className="flex flex-col md:flex-row gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search activities..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              <div className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400">
-                <Search size={16} />
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Activities Grid */}
       {loading ? (
         <div className="text-center text-neutral-500 flex justify-center items-center py-8">
