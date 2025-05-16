@@ -31,20 +31,20 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   }, []);
 
   return (
-    <div className="flex h-screen flex-col">
+    <div className="flex min-h-screen flex-col">
       {hasEmergency && (
-        <EmergencyBanner 
+        <EmergencyBanner
           message="EMERGENCY ALERT: Flash flooding reported in downtown area. Seek higher ground immediately."
           level="emergency"
         />
       )}
       <Header onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
-      
+
       <div className="flex flex-1 overflow-hidden">
         <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-        
+
         <main className="flex-1 overflow-auto bg-gray-50 dark:bg-neutral-900">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.3 }}
@@ -54,8 +54,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </motion.div>
         </main>
       </div>
-      
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };

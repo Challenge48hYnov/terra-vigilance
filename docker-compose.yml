@@ -7,7 +7,8 @@ services:
       args:
         VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
         VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY}
+    image: terra-vigilance:latest
     ports:
       - "8080:80"
-    container_name: DisasterAlerts
+    container_name: terra-vigilance
     restart: unless-stopped

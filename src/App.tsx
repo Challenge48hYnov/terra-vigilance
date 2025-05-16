@@ -10,7 +10,6 @@ import MapPage from './pages/MapPage';
 import ResourcesPage from './pages/ResourcesPage';
 import ActivitiesPage from './pages/ActivitiesPage';
 import ChatPage from './pages/ChatPage';
-import PreparedPage from './pages/PreparedPage';
 import ProfilePage from './pages/ProfilePage';
 
 function App() {
@@ -27,7 +26,6 @@ function App() {
                 <Route path="/resources" element={<ResourcesPage />} />
                 <Route path="/activities" element={<ActivitiesPage />} />
                 <Route path="/chat" element={<ChatPage />} />
-                <Route path="/prepared" element={<PreparedPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
               </Routes>
             </Layout>
