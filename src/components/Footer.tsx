@@ -21,14 +21,14 @@ const Footer: React.FC = () => {
           </div>
 
           <div>
-            <h4 className="font-medium mb-2 text-sm">t{"resources"}</h4>
+            <h4 className="font-medium mb-2 text-sm">{t("resources")}</h4>
             <ul className="space-y-1 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
                 <a
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"emergencyGuide"}
+                  {t("emergencyGuide")}
                 </a>
               </li>
               <li>
@@ -36,7 +36,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"disasterTypes"}
+                  {t("disasterTypes")}
                 </a>
               </li>
               <li>
@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"preprationTips"}
+                  {t("preprationTips")}
                 </a>
               </li>
               <li>
@@ -52,21 +52,21 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"communitySupport"}
+                  {t("communitySupport")}
                 </a>
               </li>
             </ul>
           </div>
 
           <div>
-            <h4 className="font-medium mb-2 text-sm">t{("about")}</h4>
+            <h4 className="font-medium mb-2 text-sm">{t("about")}</h4>
             <ul className="space-y-1 text-sm text-neutral-600 dark:text-neutral-400">
               <li>
                 <a
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"ourMission"}
+                  {t("ourMission")}
                 </a>
               </li>
               <li>
@@ -74,7 +74,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"dataSources"}
+                  {t("dataSources")}
                 </a>
               </li>
               <li>
@@ -82,7 +82,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"privacyPolicy"}
+                  {t("privacyPolicy")}
                 </a>
               </li>
               <li>
@@ -90,7 +90,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  t{"contactUs"}
+                  {t("contactUs")}
                 </a>
               </li>
             </ul>
@@ -99,7 +99,7 @@ const Footer: React.FC = () => {
 
         <div className="border-t border-gray-200 dark:border-neutral-700 mt-6 pt-4 flex flex-col md:flex-row justify-between items-center">
           <p className="text-xs text-neutral-500 dark:text-neutral-400">
-            © {new Date().getFullYear()} DisasterAlert
+            © {new Date().getFullYear()} {t("appName")}
           </p>
           <p className="text-xs text-neutral-500 dark:text-neutral-400 flex items-center mt-2 md:mt-0">
             Made with <Heart size={12} className="mx-1 text-red-500" /> for safety

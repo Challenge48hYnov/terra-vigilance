@@ -14,7 +14,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { activeAlerts } = useAlertContext();
-  
+
   // Handle dark mode toggle
   useEffect(() => {
     const isDark = localStorage.getItem('darkMode') === 'true';
@@ -36,7 +36,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
       document.documentElement.classList.remove('dark');
     }
   };
-  
+
   // Handle header style change on scroll
   useEffect(() => {
     const handleScroll = () => {
@@ -46,18 +46,17 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
         setScrolled(false);
       }
     };
-    
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <header 
-      className={`sticky top-0 z-30 transition-all duration-300 ${
-        scrolled 
-          ? 'bg-white/80 backdrop-blur-md shadow-sm dark:bg-neutral-900/80' 
+    <header
+      className={`sticky top-0 z-30 transition-all duration-300 ${scrolled
+          ? 'bg-white/80 backdrop-blur-md shadow-sm dark:bg-neutral-900/80'
           : 'bg-transparent'
-      }`}
+        }`}
     >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center">
@@ -68,16 +67,16 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
           >
             <Menu size={24} />
           </button>
-          
+
           <Link to="/" className="flex items-center">
             <AlertTriangle size={24} className="text-danger mr-2" />
-            <span className="text-xl font-bold">t{("appName")}</span>
+            <span className="text-xl font-bold">{t("appName")}</span>
           </Link>
         </div>
-        
+
         <div className="flex items-center space-x-3">
-          <Link 
-            to="/alerts" 
+          <Link
+            to="/alerts"
             className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
           >
             <Bell size={20} />
@@ -87,7 +86,7 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
               </span>
             )}
           </Link>
-          
+
           <button
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
             onClick={toggleDarkMode}
