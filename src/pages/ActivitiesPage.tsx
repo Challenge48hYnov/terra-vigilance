@@ -94,7 +94,7 @@ const ActivitiesPage: React.FC = () => {
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">{t("activities")}</h1>
         <p className="text-neutral-600 dark:text-neutral-400">
-          {t("activitiesDescription")}
+          {t("discoverActivities")}
         </p>
       </div>
 

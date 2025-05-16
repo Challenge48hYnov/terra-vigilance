@@ -74,11 +74,18 @@
   "comm": "Communication strategy",
   "sn_cons": "Special needs considerations",
   "stay": "Stay Informed",
+  "stay2": "Stay Safe",
   "emergencyAlerts": "Local emergency alerts",
   "community": "Community resources",
   "services": "Emergency services contacts",
   "procedures": "Evacuation procedures",
   "weather": "Weather updates",
   "family": "Family Plan",
-  "c": ""
+  "location": "Your Location",
+  "emergencyPkit": "Prepare Your Emergency Kit",
+  "emergencyPkit2": "Essential supplies to have ready before disaster strikes.",
+  "learn": "Learn more →",
+  "lr_title": "Find Local Resources",
+  "lr_desc": "Locate shelters, medical help, and supplies near you.",
+  "f_resources": "Find resources →"
 }
