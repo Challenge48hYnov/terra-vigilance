@@ -4,6 +4,7 @@ import { useUserContext } from '../contexts/UserContext';
 import { format } from 'date-fns';
 import { motion } from 'framer-motion';
 import { supabase } from '../contexts/supabaseClient';
+import { useTranslation } from "react-i18next";
 
 type ChatMessage = {
   id: number;
@@ -28,7 +29,8 @@ const ChatPage: React.FC = () => {
   const [selectedZoneId, setSelectedZoneId] = useState<number | null>(null);
   const [nicknameInput, setNicknameInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  
+  const { t } = useTranslation();
+
 
   const fetchZones = async () => {
     const { data, error } = await supabase.from('zones').select();
@@ -98,14 +100,14 @@ const ChatPage: React.FC = () => {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold mb-2">Community Chat</h1>
+        <h1 className="text-3xl font-bold mb-2">{t("communityChat")}</h1>
         <p className="text-neutral-600 dark:text-neutral-400">
-          Connect with your community during emergencies
+          {t("localChatDescription")}
         </p>
       </div>
 
       <div className="mb-4">
-        <label htmlFor="zone-select" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Choose a zone:</label>
+        <label htmlFor="zone-select" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">{t("zone")}:</label>
         <select
           id="zone-select"
           value={selectedZoneId || ''}
@@ -122,9 +124,9 @@ const ChatPage: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border-b border-gray-200 dark:border-neutral-700">
           <div className="flex items-center mb-3 sm:mb-0">
             <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-            <h2 className="font-semibold">Community Chat</h2>
+            <h2 className="font-semibold">{t("communityChat")}</h2>
             <span className="text-sm text-neutral-500 dark:text-neutral-400 ml-2">
-              {filteredMessages.length} messages
+              {filteredMessages.length} {t("nbMessages")}
             </span>
           </div>
 
@@ -151,9 +153,8 @@ const ChatPage: React.FC = () => {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  className={`flex ${
-                    msg.nickname === nicknameInput ? 'justify-end' : 'justify-start'
-                  }`}
+                  className={`flex ${msg.nickname === nicknameInput ? 'justify-end' : 'justify-start'
+                    }`}
                 >
                   <div className={`
                     max-w-[75%] rounded-lg px-4 py-3 shadow-sm
@@ -184,8 +185,8 @@ const ChatPage: React.FC = () => {
             <div className="h-full flex flex-col items-center justify-center">
               <Ban size={40} className="mb-3 text-neutral-400" />
               <p className="text-neutral-600 dark:text-neutral-400 text-center">
-                No messages yet.<br/>
-                Be the first to send a message!
+                {t("noMessagesinZone")}.<br />
+                {t("be_first")}
               </p>
             </div>
           )}
@@ -225,12 +226,12 @@ const ChatPage: React.FC = () => {
       </div>
 
       <div className="mt-6 bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4">
-        <h3 className="font-semibold mb-2">Chat Guidelines</h3>
+        <h3 className="font-semibold mb-2">{t("chatGuidelines")}</h3>
         <ul className="text-sm text-neutral-600 dark:text-neutral-400 list-disc list-inside space-y-1">
-          <li>Be respectful and helpful to community members</li>
-          <li>Share accurate information about emergency conditions</li>
-          <li>Coordinate resources and assistance with your neighbors</li>
-          <li>Report dangerous conditions to emergency services</li>
+          <li>{t("chatGuidelinesText")}</li>
+          <li>{t("chatGuidelinesText2")}</li>
+          <li>{t("chatGuidelinesText3")}</li>
+          <li>{t("chatGuidelinesText4")}</li>
         </ul>
       </div>
     </div>

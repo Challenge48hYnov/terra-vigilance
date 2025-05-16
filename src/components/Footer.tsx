@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
                   href="#"
                   className="hover:text-primary-600 dark:hover:text-primary-400"
                 >
-                  {t("preprationTips")}
+                  {t("preparationTips")}
                 </a>
               </li>
               <li>
