@@ -3,7 +3,7 @@ import {
   Activity, AlertTriangle, Compass, Calendar, MapPin,
   ThumbsUp, ThumbsDown, Filter, Search, ArrowRight
 } from 'lucide-react';
-import { useAlertContext } from '../contexts/AlertContext';
+// import { useAlertContext } from '../contexts/AlertContext';
 import { motion } from 'framer-motion';
 import { supabase } from '../contexts/supabaseClient';
 
@@ -21,7 +21,6 @@ export interface ActivityItem {
 }
 
 const ActivitiesPage: React.FC = () => {
-  const { activeAlerts } = useAlertContext();
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [zones, setZones] = useState<{ id: number; name: string }[]>([]);
@@ -68,14 +67,6 @@ const ActivitiesPage: React.FC = () => {
     return zone ? zone.name : 'Unknown zone';
   };
 
-  // Check if an activity is in an area with active alerts
-  const hasActiveAlert = (location: string) => {
-    return activeAlerts.some(alert =>
-      alert.location === location &&
-      (alert.level === 'emergency' || alert.level === 'danger')
-    );
-  };
-
   return (
     <div>
       <div className="mb-6">
@@ -102,38 +93,6 @@ const ActivitiesPage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* <div className="flex items-center">
-              <Filter size={16} className="mr-2 text-neutral-500" />
-              <select
-                className="pl-2 pr-8 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                <option value="recreation">Recreation</option>
-                <option value="volunteer">Volunteer</option>
-                <option value="educational">Educational</option>
-                <option value="extreme">Extreme</option>
-              </select>
-            </div> */}
-
-            {/* <div className="flex items-center">
-              <AlertTriangle size={16} className="mr-2 text-neutral-500" />
-              <select
-                className="pl-2 pr-8 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={selectedSafety}
-                onChange={(e) => setSelectedSafety(e.target.value)}
-              >
-                <option value="all">All Safety Levels</option>
-                <option value="safe">Safe</option>
-                <option value="moderate">Moderate Risk</option>
-                <option value="risky">High Risk</option>
-                <option value="dangerous">Dangerous</option>
-              </select>
-            </div> */}
-          </div>
         </div>
       </div>
 
@@ -150,7 +109,6 @@ const ActivitiesPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => {
-              const hasAlert = hasActiveAlert(getZoneName(activity.zone_id));
 
               return (
                 <motion.div
@@ -166,15 +124,6 @@ const ActivitiesPage: React.FC = () => {
                       alt={activity.name}
                       className="w-full h-48 object-cover"
                     />
-
-                    {hasAlert && (
-                      <div className="absolute top-2 left-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 animate-pulse">
-                          <AlertTriangle size={12} className="mr-1" />
-                          Alert in Area
-                        </span>
-                      </div>
-                    )}
                   </div>
 
                   <div className="p-4">
@@ -198,13 +147,6 @@ const ActivitiesPage: React.FC = () => {
                           <span>End: {new Date(activity.end_date).toLocaleDateString()}</span>
                         </div>
                       )}
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      {/* <button className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
-                      Details
-                      <ArrowRight size={14} className="ml-1" />
-                    </button> */}
                     </div>
                   </div>
                 </motion.div>

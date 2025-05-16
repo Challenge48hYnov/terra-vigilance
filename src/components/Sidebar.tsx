@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   Home, Map, AlertTriangle, MessageSquare,
-  Activity, User, Zap, X
+  Activity, Zap, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -16,12 +16,10 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   const navItems = [
     { path: '/', name: 'Home', icon: <Home size={20} /> },
-    { path: '/alerts', name: 'Alerts', icon: <AlertTriangle size={20} /> },
     { path: '/map', name: 'Hazard Map', icon: <Map size={20} /> },
     { path: '/resources', name: 'Resources', icon: <Zap size={20} /> },
     { path: '/activities', name: 'Activities', icon: <Activity size={20} /> },
     { path: '/chat', name: 'Local Chat', icon: <MessageSquare size={20} /> },
-    { path: '/profile', name: 'Profile', icon: <User size={20} /> },
   ];
 
   const sidebarVariants = {
