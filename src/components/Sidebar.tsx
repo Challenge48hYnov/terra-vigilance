@@ -5,6 +5,8 @@ import {
   Activity, User, Zap, X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
+
 
 interface SidebarProps {
   open: boolean;
@@ -12,16 +14,16 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
+  const { t } = useTranslation();
   const location = useLocation();
 
   const navItems = [
-    { path: '/', name: 'Home', icon: <Home size={20} /> },
-    { path: '/alerts', name: 'Alerts', icon: <AlertTriangle size={20} /> },
-    { path: '/map', name: 'Hazard Map', icon: <Map size={20} /> },
-    { path: '/resources', name: 'Resources', icon: <Zap size={20} /> },
-    { path: '/activities', name: 'Activities', icon: <Activity size={20} /> },
-    { path: '/chat', name: 'Local Chat', icon: <MessageSquare size={20} /> },
-    { path: '/profile', name: 'Profile', icon: <User size={20} /> },
+    { path: '/', name: t('home'), icon: <Home size={20} /> },
+    { path: '/alerts', name: t('alerts'), icon: <AlertTriangle size={20} /> },
+    { path: '/map', name: t('hazardMap'), icon: <Map size={20} /> },
+    { path: '/resources', name: t('resources'), icon: <Zap size={20} /> },
+    { path: '/activities', name: t('activities'), icon: <Activity size={20} /> },
+    { path: '/chat', name: t('localChat'), icon: <MessageSquare size={20} /> },
   ];
 
   const sidebarVariants = {
@@ -60,7 +62,9 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
         <div className="p-4 flex justify-between items-center border-b border-gray-200 dark:border-neutral-700">
           <Link to="/" className="flex items-center">
             <AlertTriangle size={24} className="text-danger mr-2" />
-            <span className="text-xl font-bold">DisasterAlert</span>
+            <span className="text-xl font-bold">
+              {t('appName')}
+            </span>
           </Link>
           <button
             className="p-1 rounded-md hover:bg-gray-100 dark:hover:bg-neutral-700"
