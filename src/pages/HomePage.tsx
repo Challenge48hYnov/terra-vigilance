@@ -6,7 +6,6 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 const HomePage: React.FC = () => {
-  const { currentUser, isLoading } = useUserContext();
   const { t } = useTranslation();
 
   const containerVariants = {

@@ -12,7 +12,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
   const { t } = useTranslation();
   const [darkMode, setDarkMode] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { activeAlerts } = useAlertContext();
 
   // Handle dark mode toggle
   useEffect(() => {
@@ -74,18 +73,6 @@ const Header: React.FC<HeaderProps> = ({ onMenuToggle }) => {
         </div>
 
         <div className="flex items-center space-x-3">
-          <Link
-            to="/alerts"
-            className="relative p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
-          >
-            <Bell size={20} />
-            {activeAlerts.length > 0 && (
-              <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-danger rounded-full">
-                {activeAlerts.length}
-              </span>
-            )}
-          </Link>
-
           <button
             className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-neutral-800"
             onClick={toggleDarkMode}

@@ -19,7 +19,6 @@ const Sidebar: React.FC<SidebarProps> = ({ open, onClose }) => {
 
   const navItems = [
     { path: '/', name: t('home'), icon: <Home size={20} /> },
-    { path: '/alerts', name: t('alerts'), icon: <AlertTriangle size={20} /> },
     { path: '/map', name: t('hazardMap'), icon: <Map size={20} /> },
     { path: '/resources', name: t('resources'), icon: <Zap size={20} /> },
     { path: '/activities', name: t('activities'), icon: <Activity size={20} /> },

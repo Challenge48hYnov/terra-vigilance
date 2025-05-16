@@ -30,7 +30,6 @@ export interface ActivityItem {
 
 const ActivitiesPage: React.FC = () => {
   const { t } = useTranslation();
-  const { activeAlerts } = useAlertContext();
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [activities, setActivities] = useState<ActivityItem[]>([]);
   const [zones, setZones] = useState<{ id: number; name: string }[]>([]);
@@ -79,14 +78,6 @@ const ActivitiesPage: React.FC = () => {
     return zone ? zone.name : "Unknown zone";
   };
 
-  // Check if an activity is in an area with active alerts
-  const hasActiveAlert = (location: string) => {
-    return activeAlerts.some(
-      (alert) =>
-        alert.location === location &&
-        (alert.level === "emergency" || alert.level === "danger")
-    );
-  };
 
   return (
     <div>
@@ -155,15 +146,6 @@ const ActivitiesPage: React.FC = () => {
                       alt={activity.name}
                       className="w-full h-48 object-cover"
                     />
-
-                    {hasAlert && (
-                      <div className="absolute top-2 left-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200 animate-pulse">
-                          <AlertTriangle size={12} className="mr-1" />
-                          {t("alertInArea")}
-                        </span>
-                      </div>
-                    )}
                   </div>
 
                   <div className="p-4">
