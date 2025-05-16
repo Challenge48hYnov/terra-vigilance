@@ -1,20 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Map, MessageSquare, Shield, Zap } from 'lucide-react';
-import { useAlertContext } from '../contexts/AlertContext';
+import { Map, MessageSquare, Shield, Zap } from 'lucide-react';
 import { useUserContext } from '../contexts/UserContext';
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 
 const HomePage: React.FC = () => {
-  const { activeAlerts } = useAlertContext();
   const { currentUser, isLoading } = useUserContext();
   const { t } = useTranslation();
-
-  // Get alerts for user's location
-  const localAlerts = currentUser
-    ? activeAlerts.filter(alert => alert.location === currentUser.location.zone)
-    : [];
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -60,34 +53,6 @@ const HomePage: React.FC = () => {
           </motion.p>
         </div>
 
-        {/* User Location Status */}
-        {!isLoading && currentUser && (
-          <motion.div
-            className="mb-8 bg-white dark:bg-neutral-800 rounded-lg shadow-md p-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-          >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-              <div>
-                <h2 className="text-lg font-medium">{t("location")}</h2>
-                <p className="text-neutral-600 dark:text-neutral-400">{currentUser.location.address}</p>
-              </div>
-              <div className="flex items-center">
-                <span
-                  className={`inline-flex h-3 w-3 rounded-full mr-2 ${localAlerts.length > 0 ? 'bg-danger' : 'bg-safe'
-                    }`}
-                ></span>
-                <span>
-                  {localAlerts.length > 0
-                    ? `${localAlerts.length} active alert${localAlerts.length > 1 ? 's' : ''} in your area`
-                    : 'No active alerts in your area'}
-                </span>
-              </div>
-            </div>
-          </motion.div>
-        )}
-
         {/* Quick Access Buttons */}
         <motion.div
           className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12"
@@ -95,23 +60,6 @@ const HomePage: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          <motion.div variants={itemVariants}>
-            <Link
-              to="/alerts"
-              className="block bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-6 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            >
-              <div className="flex flex-col items-center text-center">
-                <div className="bg-red-100 dark:bg-red-900/30 p-3 rounded-full mb-4">
-                  <AlertTriangle size={24} className="text-red-600 dark:text-red-400" />
-                </div>
-                <h3 className="text-lg font-medium mb-2">Active Alerts</h3>
-                <p className="text-neutral-600 dark:text-neutral-400">
-                  View all active emergency alerts and warnings for your area
-                </p>
-              </div>
-            </Link>
-          </motion.div>
-
           <motion.div variants={itemVariants}>
             <Link
               to="/map"
@@ -128,7 +76,24 @@ const HomePage: React.FC = () => {
               </div>
             </Link>
           </motion.div>
-
+          
+          <motion.div variants={itemVariants}>
+            <Link 
+              to="/resources" 
+              className="block bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-6 hover:bg-purple-100 dark:hover:bg-purple-900/30 transition-colors"
+            >
+              <div className="flex flex-col items-center text-center">
+                <div className="bg-purple-100 dark:bg-purple-900/30 p-3 rounded-full mb-4">
+                  <Shield size={24} className="text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-lg font-medium mb-2">Emergency Resources</h3>
+                <p className="text-neutral-600 dark:text-neutral-400">
+                  Find shelters, medical help, and supplies near you
+                </p>
+              </div>
+            </Link>
+          </motion.div>
+          
           <motion.div variants={itemVariants}>
             <Link
               to="/chat"
@@ -146,67 +111,7 @@ const HomePage: React.FC = () => {
             </Link>
           </motion.div>
         </motion.div>
-
-        {/* Recent Alerts Section */}
-        <div className="mb-12">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-2xl font-bold">Recent Alerts</h2>
-            <Link
-              to="/alerts"
-              className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
-            >
-              View all
-            </Link>
-          </div>
-
-          {activeAlerts.length > 0 ? (
-            <div className="space-y-4">
-              {activeAlerts.slice(0, 3).map((alert) => (
-                <div
-                  key={alert.id}
-                  className={`
-                    p-4 rounded-lg border 
-                    ${alert.level === 'emergency' ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800' : ''}
-                    ${alert.level === 'danger' ? 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800' : ''}
-                    ${alert.level === 'warning' ? 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800' : ''}
-                    ${alert.level === 'safe' ? 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800' : ''}
-                  `}
-                >
-                  <div className="flex items-start">
-                    <div
-                      className={`
-                        p-2 rounded-full mr-4 flex-shrink-0
-                        ${alert.level === 'emergency' ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : ''}
-                        ${alert.level === 'danger' ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400' : ''}
-                        ${alert.level === 'warning' ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : ''}
-                        ${alert.level === 'safe' ? 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400' : ''}
-                      `}
-                    >
-                      <AlertTriangle size={20} />
-                    </div>
-                    <div>
-                      <div className="flex items-center mb-1">
-                        <h3 className="font-semibold mr-2">{alert.title}</h3>
-                        <span className="text-sm text-neutral-500 dark:text-neutral-400">
-                          {alert.location}
-                        </span>
-                      </div>
-                      <p className="text-neutral-700 dark:text-neutral-300 mb-2">{alert.message}</p>
-                      <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                        {alert.timestamp.toLocaleString()}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md p-8 text-center">
-              <p className="text-neutral-600 dark:text-neutral-400">No active alerts at this time.</p>
-            </div>
-          )}
-        </div>
-
+        
         {/* Resources */}
         <div>
           <h2 className="text-2xl font-bold mb-4">{t("emergencyRessources")}</h2>
@@ -223,8 +128,8 @@ const HomePage: React.FC = () => {
                   </p>
                 </div>
               </div>
-              <Link
-                to="/prepared"
+              <Link 
+                to="/resources" 
                 className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm"
               >
                 {t("learn")}

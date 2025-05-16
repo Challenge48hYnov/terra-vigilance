@@ -11,7 +11,6 @@ import {
   Search,
   ArrowRight,
 } from "lucide-react";
-import { useAlertContext } from "../contexts/AlertContext";
 import { motion } from "framer-motion";
 import { supabase } from "../contexts/supabaseClient";
 import { useTranslation } from "react-i18next";
@@ -115,38 +114,6 @@ const ActivitiesPage: React.FC = () => {
               </div>
             </div>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3">
-            {/* <div className="flex items-center">
-              <Filter size={16} className="mr-2 text-neutral-500" />
-              <select
-                className="pl-2 pr-8 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-              >
-                <option value="all">All Categories</option>
-                <option value="recreation">Recreation</option>
-                <option value="volunteer">Volunteer</option>
-                <option value="educational">Educational</option>
-                <option value="extreme">Extreme</option>
-              </select>
-            </div> */}
-
-            {/* <div className="flex items-center">
-              <AlertTriangle size={16} className="mr-2 text-neutral-500" />
-              <select
-                className="pl-2 pr-8 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
-                value={selectedSafety}
-                onChange={(e) => setSelectedSafety(e.target.value)}
-              >
-                <option value="all">All Safety Levels</option>
-                <option value="safe">Safe</option>
-                <option value="moderate">Moderate Risk</option>
-                <option value="risky">High Risk</option>
-                <option value="dangerous">Dangerous</option>
-              </select>
-            </div> */}
-          </div>
         </div>
       </div>
 
@@ -173,7 +140,6 @@ const ActivitiesPage: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredActivities.length > 0 ? (
             filteredActivities.map((activity) => {
-              const hasAlert = hasActiveAlert(getZoneName(activity.zone_id));
 
               return (
                 <motion.div
@@ -229,13 +195,6 @@ const ActivitiesPage: React.FC = () => {
                           </span>
                         </div>
                       )}
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      {/* <button className="flex items-center text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 text-sm font-medium">
-                      Details
-                      <ArrowRight size={14} className="ml-1" />
-                    </button> */}
                     </div>
                   </div>
                 </motion.div>

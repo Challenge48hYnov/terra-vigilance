@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, Bell, Sun, Moon, AlertTriangle } from 'lucide-react';
-import { useAlertContext } from '../contexts/AlertContext';
+import { Menu, Sun, Moon, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 
