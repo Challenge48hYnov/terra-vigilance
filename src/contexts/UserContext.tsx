@@ -28,6 +28,7 @@ interface UserContextType {
   updateUserLocation: (location: Partial<UserLocation>) => void;
   updateNotificationPreferences: (prefs: Partial<User['notificationPreferences']>) => void;
   safetyCheckIn: () => void;
+  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -52,7 +53,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       try {
         // Mock API response
         await new Promise(resolve => setTimeout(resolve, 1000));
-        
+
         const mockUser: User = {
           id: '123',
           name: 'Jane Doe',
@@ -71,7 +72,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
           },
           safetyCheckedIn: false,
         };
-        
+
         setCurrentUser(mockUser);
       } catch (error) {
         console.error('Failed to fetch user:', error);
@@ -79,13 +80,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsLoading(false);
       }
     };
-    
+
     fetchUser();
   }, []);
 
   const updateUserLocation = (location: Partial<UserLocation>) => {
     if (!currentUser) return;
-    
+
     setCurrentUser(prev => {
       if (!prev) return prev;
       return {
@@ -100,7 +101,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const updateNotificationPreferences = (prefs: Partial<User['notificationPreferences']>) => {
     if (!currentUser) return;
-    
+
     setCurrentUser(prev => {
       if (!prev) return prev;
       return {
@@ -115,7 +116,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const safetyCheckIn = () => {
     if (!currentUser) return;
-    
+
     setCurrentUser(prev => {
       if (!prev) return prev;
       return {
@@ -132,7 +133,8 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading, 
         updateUserLocation, 
         updateNotificationPreferences, 
-        safetyCheckIn 
+        safetyCheckIn,
+        setCurrentUser
       }}
     >
       {children}

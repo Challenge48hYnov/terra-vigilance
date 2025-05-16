@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, User, Clock, Search, Ban } from 'lucide-react';
 import { useUserContext } from '../contexts/UserContext';
 import { format } from 'date-fns';
@@ -13,17 +13,41 @@ type ChatMessage = {
   zone_id: number;
 };
 
+type Zone = {
+  id: number;
+  name: string;
+};
+
 const ChatPage: React.FC = () => {
-  const { currentUser } = useUserContext();
+  // const { currentUser } = useUserContext();
+  useUserContext();
   const [messageText, setMessageText] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [zones, setZones] = useState<Zone[]>([]);
+  const [selectedZoneId, setSelectedZoneId] = useState<number | null>(null);
+  const [nicknameInput, setNicknameInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  
 
-  const fetchMessages = async () => {
+  const fetchZones = async () => {
+    const { data, error } = await supabase.from('zones').select();
+    if (data) {
+      setZones(data);
+      setSelectedZoneId(data[0]?.id || null);
+    }
+    if (error) {
+      console.error('Error fetching zones:', error);
+    }
+  };
+
+  const fetchMessages = useCallback(async () => {
+    if (!selectedZoneId) return;
+
     const { data, error } = await supabase
       .from('messages')
       .select()
+      .eq('zone_id', selectedZoneId)
       .order('created_at', { ascending: true });
 
     if (error) {
@@ -31,22 +55,26 @@ const ChatPage: React.FC = () => {
     } else {
       setMessages(data as ChatMessage[]);
     }
-  };
+  }, [selectedZoneId]);
+
+  useEffect(() => {
+    fetchZones();
+  }, []);
 
   useEffect(() => {
     fetchMessages();
-  }, []);
+  }, [fetchMessages]);
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = messageText.trim();
-    if (!trimmed) return;
+    if (!trimmed || !selectedZoneId || !nicknameInput.trim()) return;
 
     const { error } = await supabase.from('messages').insert([
       {
         message: trimmed,
-        nickname: currentUser?.name || 'Anonymous User',
-        zone_id: 1 // À adapter selon ta logique
+        nickname: nicknameInput.trim(),
+        zone_id: selectedZoneId
       }
     ]);
 
@@ -74,6 +102,20 @@ const ChatPage: React.FC = () => {
         <p className="text-neutral-600 dark:text-neutral-400">
           Connect with your community during emergencies
         </p>
+      </div>
+
+      <div className="mb-4">
+        <label htmlFor="zone-select" className="block text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1">Choose a zone:</label>
+        <select
+          id="zone-select"
+          value={selectedZoneId || ''}
+          onChange={(e) => setSelectedZoneId(Number(e.target.value))}
+          className="w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800"
+        >
+          {zones.map((zone) => (
+            <option key={zone.id} value={zone.id}>{zone.name}</option>
+          ))}
+        </select>
       </div>
 
       <div className="bg-white dark:bg-neutral-800 rounded-lg shadow-md overflow-hidden">
@@ -110,12 +152,12 @@ const ChatPage: React.FC = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   className={`flex ${
-                    msg.nickname === (currentUser?.name || 'Anonymous User') ? 'justify-end' : 'justify-start'
+                    msg.nickname === nicknameInput ? 'justify-end' : 'justify-start'
                   }`}
                 >
                   <div className={`
                     max-w-[75%] rounded-lg px-4 py-3 shadow-sm
-                    ${msg.nickname === (currentUser?.name || 'Anonymous User')
+                    ${msg.nickname === nicknameInput
                       ? 'bg-primary-50 border border-primary-200 dark:bg-primary-900/20 dark:border-primary-800/50'
                       : 'bg-white border border-gray-200 dark:bg-neutral-800 dark:border-neutral-700'
                     }
@@ -150,6 +192,17 @@ const ChatPage: React.FC = () => {
         </div>
 
         <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200 dark:border-neutral-700">
+          <div className="flex flex-col sm:flex-row gap-2 mb-2">
+            <input
+              type="text"
+              placeholder="Enter your name"
+              className="w-full sm:w-1/3 px-4 py-2 border border-gray-300 dark:border-neutral-700 rounded-md bg-white dark:bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-primary-500"
+              value={nicknameInput}
+              onChange={(e) => setNicknameInput(e.target.value)}
+              required
+            />
+          </div>
+
           <div className="flex items-center">
             <input
               type="text"
@@ -158,11 +211,12 @@ const ChatPage: React.FC = () => {
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               autoComplete="off"
+              required
             />
             <button
               type="submit"
               className="flex items-center justify-center h-10 px-4 bg-primary-600 text-white rounded-r-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
-              disabled={!messageText.trim()}
+              disabled={!messageText.trim() || !nicknameInput.trim()}
             >
               <Send size={20} />
             </button>
